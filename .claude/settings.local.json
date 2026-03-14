@@ -1,7 +1,8 @@
 {
   "permissions": {
     "allow": [
-      "Bash(test -f \"D:\\\\PyCharmProjects\\\\CareNest\\\\backend\\\\.dockerignore\")"
+      "Bash(test -f \"D:\\\\PyCharmProjects\\\\CareNest\\\\backend\\\\.dockerignore\")",
+      "Bash(python -c \"import secrets; print\\(secrets.token_urlsafe\\(50\\)\\)\")"
     ]
   }
 }
