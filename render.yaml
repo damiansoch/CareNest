@@ -122,9 +122,8 @@ services:
     dockerfilePath: ./frontend/Dockerfile
     dockerContext: ./frontend
     plan: free
-    dockerBuildArgs:
-      - key: NEXT_PUBLIC_API_URL
-        value: "https://carenest-backend.onrender.com/api/v1"
     envVars:
       - key: NODE_ENV
         value: production
+      - key: NEXT_PUBLIC_API_URL
+        value: "https://carenest-backend.onrender.com/api/v1"
