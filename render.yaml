@@ -24,7 +24,7 @@ services:
     dockerfilePath: ./backend/Dockerfile
     dockerContext: ./backend
     plan: free
-    healthCheckPath: /api/v1/auth/me/
+    healthCheckPath: /api/v1/health/
     envVars:
       - key: DJANGO_SETTINGS_MODULE
         value: config.settings.production
@@ -44,9 +44,9 @@ services:
       - key: ALLOWED_HOSTS
         value: ".onrender.com"
       - key: CORS_ALLOWED_ORIGINS
-        value: "https://carenest-frontend.onrender.com"
+        value: "https://carenest-frontend-9rww.onrender.com"
       - key: FRONTEND_URL
-        value: "https://carenest-frontend.onrender.com"
+        value: "https://carenest-frontend-9rww.onrender.com"
       - key: CSRF_TRUSTED_ORIGINS
         value: "https://*.onrender.com"
       - key: EMAIL_HOST
@@ -71,4 +71,4 @@ services:
       - key: NODE_ENV
         value: production
       - key: NEXT_PUBLIC_API_URL
-        value: "https://carenest-backend.onrender.com/api/v1"
+        value: "https://carenest-backend-u9tv.onrender.com/api/v1"
