@@ -1,0 +1,60 @@
+# ─── Environment & secrets ───────────────────────────────────────────────────
+.env
+.env.*
+!.env.example
+
+# ─── Python / Django ─────────────────────────────────────────────────────────
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.so
+*.egg
+*.egg-info/
+dist/
+build/
+.eggs/
+.venv/
+venv/
+env/
+
+# Django runtime artifacts
+backend/staticfiles/
+backend/media/
+backend/db.sqlite3
+
+# Celery
+celerybeat-schedule
+celerybeat.pid
+
+# ─── Node / Next.js ──────────────────────────────────────────────────────────
+node_modules/
+frontend/.next/
+frontend/out/
+
+# ─── Docker ──────────────────────────────────────────────────────────────────
+# (docker-compose.yml and Dockerfiles are committed)
+
+# ─── IDEs & editors ──────────────────────────────────────────────────────────
+.idea/
+.vscode/
+*.iml
+*.swp
+*.swo
+.DS_Store
+Thumbs.db
+
+# ─── OS ──────────────────────────────────────────────────────────────────────
+.DS_Store
+desktop.ini
+
+# ─── Logs ────────────────────────────────────────────────────────────────────
+*.log
+logs/
+
+# ─── Test / coverage ─────────────────────────────────────────────────────────
+.coverage
+htmlcov/
+.pytest_cache/
+coverage.xml
+*.coveragerc

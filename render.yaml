@@ -1,0 +1,130 @@
+# CareNest — Render Blueprint
+# Deploy via: Render Dashboard → New → Blueprint → connect repo
+
+databases:
+  - name: carenest-db
+    plan: free
+    databaseName: carenest
+    user: carenest
+
+services:
+  # ─── Redis ──────────────────────────────────────────────────────────────────
+  - type: redis
+    name: carenest-redis
+    plan: free
+    ipAllowList: []
+
+  # ─── Django Backend ──────────────────────────────────────────────────────────
+  - type: web
+    name: carenest-backend
+    env: docker
+    dockerfilePath: ./backend/Dockerfile
+    dockerContext: ./backend
+    plan: free
+    healthCheckPath: /api/v1/auth/me/
+    envVars:
+      - key: DJANGO_SETTINGS_MODULE
+        value: config.settings.production
+      - key: SECRET_KEY
+        sync: false  # Set manually in Render dashboard
+      - key: DEBUG
+        value: "False"
+      - key: DATABASE_URL
+        fromDatabase:
+          name: carenest-db
+          property: connectionString
+      - key: REDIS_URL
+        fromService:
+          name: carenest-redis
+          type: redis
+          property: connectionString
+      - key: ALLOWED_HOSTS
+        value: ".onrender.com"
+      - key: CORS_ALLOWED_ORIGINS
+        value: "https://carenest-frontend.onrender.com"
+      - key: FRONTEND_URL
+        value: "https://carenest-frontend.onrender.com"
+      - key: CSRF_TRUSTED_ORIGINS
+        value: "https://*.onrender.com"
+      - key: EMAIL_HOST
+        value: smtp.resend.com
+      - key: EMAIL_PORT
+        value: "587"
+      - key: EMAIL_HOST_USER
+        value: resend
+      - key: EMAIL_HOST_PASSWORD
+        sync: false  # Set to your Resend API key in Render dashboard
+      - key: DEFAULT_FROM_EMAIL
+        value: noreply@carenest.app
+
+  # ─── Celery Worker ───────────────────────────────────────────────────────────
+  - type: worker
+    name: carenest-celery
+    env: docker
+    dockerfilePath: ./backend/Dockerfile
+    dockerContext: ./backend
+    plan: free
+    startCommand: celery -A config worker -l info -Q default
+    envVars:
+      - key: DJANGO_SETTINGS_MODULE
+        value: config.settings.production
+      - key: SECRET_KEY
+        sync: false
+      - key: DATABASE_URL
+        fromDatabase:
+          name: carenest-db
+          property: connectionString
+      - key: REDIS_URL
+        fromService:
+          name: carenest-redis
+          type: redis
+          property: connectionString
+      - key: EMAIL_HOST
+        value: smtp.resend.com
+      - key: EMAIL_PORT
+        value: "587"
+      - key: EMAIL_HOST_USER
+        value: resend
+      - key: EMAIL_HOST_PASSWORD
+        sync: false
+      - key: DEFAULT_FROM_EMAIL
+        value: noreply@carenest.app
+      - key: FRONTEND_URL
+        value: "https://carenest-frontend.onrender.com"
+
+  # ─── Celery Beat ─────────────────────────────────────────────────────────────
+  - type: worker
+    name: carenest-beat
+    env: docker
+    dockerfilePath: ./backend/Dockerfile
+    dockerContext: ./backend
+    plan: free
+    startCommand: celery -A config beat -l info --scheduler django_celery_beat.schedulers:DatabaseScheduler
+    envVars:
+      - key: DJANGO_SETTINGS_MODULE
+        value: config.settings.production
+      - key: SECRET_KEY
+        sync: false
+      - key: DATABASE_URL
+        fromDatabase:
+          name: carenest-db
+          property: connectionString
+      - key: REDIS_URL
+        fromService:
+          name: carenest-redis
+          type: redis
+          property: connectionString
+
+  # ─── Next.js Frontend ────────────────────────────────────────────────────────
+  - type: web
+    name: carenest-frontend
+    env: docker
+    dockerfilePath: ./frontend/Dockerfile
+    dockerContext: ./frontend
+    plan: free
+    dockerBuildArgs:
+      - key: NEXT_PUBLIC_API_URL
+        value: "https://carenest-backend.onrender.com/api/v1"
+    envVars:
+      - key: NODE_ENV
+        value: production
