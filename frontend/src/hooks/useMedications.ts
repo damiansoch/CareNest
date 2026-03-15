@@ -2,6 +2,7 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { medicationsApi } from "@/lib/api/endpoints";
 import type { Medication } from "@/types";
 import { toast } from "@/store/toast";
+import { extractApiErrors } from "@/lib/utils/apiErrors";
 
 export function useMedications(seniorId: string, activeOnly = false) {
   return useQuery({
@@ -22,7 +23,7 @@ export function useCreateMedication(seniorId: string) {
       qc.invalidateQueries({ queryKey: ["medications", seniorId] });
       toast({ title: "Lek dodany" });
     },
-    onError: () => toast({ title: "Błąd", description: "Nie udało się dodać leku.", variant: "destructive" }),
+    onError: (error) => toast({ title: "Błąd", description: extractApiErrors(error), variant: "destructive" }),
   });
 }
 
@@ -34,7 +35,7 @@ export function useUpdateMedication(seniorId: string, id: string) {
       qc.invalidateQueries({ queryKey: ["medications", seniorId] });
       toast({ title: "Lek zaktualizowany" });
     },
-    onError: () => toast({ title: "Błąd", description: "Nie udało się zapisać.", variant: "destructive" }),
+    onError: (error) => toast({ title: "Błąd", description: extractApiErrors(error), variant: "destructive" }),
   });
 }
 

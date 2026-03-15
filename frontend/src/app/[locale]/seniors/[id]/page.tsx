@@ -11,6 +11,7 @@ import { Badge } from "@/components/ui/badge";
 import { PageSpinner } from "@/components/ui/spinner";
 import { useSenior, useArchiveSenior } from "@/hooks/useSeniors";
 import { useRouter } from "next/navigation";
+import { DocumentsSection } from "@/components/documents/DocumentsSection";
 
 export default function SeniorDetailPage({
   params,
@@ -31,6 +32,9 @@ export default function SeniorDetailPage({
 function SeniorDetailContent({ locale, id }: { locale: string; id: string }) {
   const t = useTranslations("seniors");
   const tCommon = useTranslations("common");
+  const tMedications = useTranslations("medications");
+  const tAppointments = useTranslations("appointments");
+  const tTracker = useTranslations("tracker");
   const router = useRouter();
   const { data: senior, isLoading } = useSenior(id);
   const archive = useArchiveSenior();
@@ -109,7 +113,7 @@ function SeniorDetailContent({ locale, id }: { locale: string; id: string }) {
             <Card className="hover:shadow-md transition-shadow cursor-pointer">
               <CardHeader>
                 <Pill className="text-primary mb-2" size={24} />
-                <CardTitle>{useTranslations("medications")("title")}</CardTitle>
+                <CardTitle>{tMedications("title")}</CardTitle>
               </CardHeader>
               <CardContent>
                 <p className="text-sm text-muted-foreground">
@@ -123,7 +127,7 @@ function SeniorDetailContent({ locale, id }: { locale: string; id: string }) {
             <Card className="hover:shadow-md transition-shadow cursor-pointer">
               <CardHeader>
                 <Calendar className="text-primary mb-2" size={24} />
-                <CardTitle>{useTranslations("appointments")("title")}</CardTitle>
+                <CardTitle>{tAppointments("title")}</CardTitle>
               </CardHeader>
               <CardContent>
                 <p className="text-sm text-muted-foreground">
@@ -137,7 +141,7 @@ function SeniorDetailContent({ locale, id }: { locale: string; id: string }) {
             <Card className="hover:shadow-md transition-shadow cursor-pointer">
               <CardHeader>
                 <Printer className="text-primary mb-2" size={24} />
-                <CardTitle>{useTranslations("tracker")("title")}</CardTitle>
+                <CardTitle>{tTracker("title")}</CardTitle>
               </CardHeader>
               <CardContent>
                 <p className="text-sm text-muted-foreground">
@@ -146,6 +150,13 @@ function SeniorDetailContent({ locale, id }: { locale: string; id: string }) {
               </CardContent>
             </Card>
           </Link>
+        </div>
+      )}
+
+      {/* Documents section */}
+      {!senior.is_archived && (
+        <div className="mt-8">
+          <DocumentsSection seniorId={id} locale={locale} />
         </div>
       )}
     </div>

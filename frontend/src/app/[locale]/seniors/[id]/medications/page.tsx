@@ -72,8 +72,12 @@ function MedicationsContent({ locale, seniorId }: { locale: string; seniorId: st
           <DialogContent title={t("addMedication")} className="max-h-[90vh] overflow-y-auto">
             <MedicationForm
               onSubmit={async (data) => {
-                await create.mutateAsync(data);
-                setCreateOpen(false);
+                try {
+                  await create.mutateAsync(data);
+                  setCreateOpen(false);
+                } catch {
+                  // error toast handled by useCreateMedication onError
+                }
               }}
               onCancel={() => setCreateOpen(false)}
             />
@@ -140,8 +144,12 @@ function MedicationsContent({ locale, seniorId }: { locale: string; seniorId: st
             <MedicationForm
               defaultValues={editingMed}
               onSubmit={async (data) => {
-                await update.mutateAsync(data);
-                setEditingMed(null);
+                try {
+                  await update.mutateAsync(data);
+                  setEditingMed(null);
+                } catch {
+                  // error toast handled by useUpdateMedication onError
+                }
               }}
               onCancel={() => setEditingMed(null)}
             />

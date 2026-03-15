@@ -2,6 +2,7 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { seniorsApi } from "@/lib/api/endpoints";
 import type { Senior } from "@/types";
 import { toast } from "@/store/toast";
+import { extractApiErrors } from "@/lib/utils/apiErrors";
 
 export function useSeniors(includeArchived = false) {
   return useQuery({
@@ -32,7 +33,7 @@ export function useCreateSenior() {
       qc.invalidateQueries({ queryKey: ["seniors"] });
       toast({ title: "Podopieczny dodany", variant: "default" });
     },
-    onError: () => toast({ title: "Błąd", description: "Nie udało się dodać.", variant: "destructive" }),
+    onError: (error) => toast({ title: "Błąd", description: extractApiErrors(error), variant: "destructive" }),
   });
 }
 
@@ -45,7 +46,7 @@ export function useUpdateSenior(id: string) {
       qc.invalidateQueries({ queryKey: ["seniors", id] });
       toast({ title: "Zapisano zmiany" });
     },
-    onError: () => toast({ title: "Błąd", description: "Nie udało się zapisać.", variant: "destructive" }),
+    onError: (error) => toast({ title: "Błąd", description: extractApiErrors(error), variant: "destructive" }),
   });
 }
 

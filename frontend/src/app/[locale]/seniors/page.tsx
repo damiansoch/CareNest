@@ -11,6 +11,7 @@ import { EmptyState } from "@/components/ui/empty-state";
 import { Button } from "@/components/ui/button";
 import { PageSpinner } from "@/components/ui/spinner";
 import { useSeniors, useArchiveSenior } from "@/hooks/useSeniors";
+import { AnimatedList, AnimatedItem } from "@/components/ui/animated-list";
 
 export default function SeniorsPage({
   params,
@@ -76,16 +77,17 @@ function SeniorsContent({ locale }: { locale: string }) {
       )}
 
       {!isLoading && seniors && seniors.length > 0 && (
-        <div className="grid gap-4 sm:grid-cols-1 lg:grid-cols-2">
+        <AnimatedList className="grid gap-4 sm:grid-cols-1 lg:grid-cols-2">
           {seniors.map((senior) => (
-            <SeniorCard
-              key={senior.id}
-              senior={senior}
-              locale={locale}
-              onArchive={handleArchive}
-            />
+            <AnimatedItem key={senior.id}>
+              <SeniorCard
+                senior={senior}
+                locale={locale}
+                onArchive={handleArchive}
+              />
+            </AnimatedItem>
           ))}
-        </div>
+        </AnimatedList>
       )}
     </div>
   );

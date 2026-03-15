@@ -26,7 +26,17 @@ class SeniorListCreateView(generics.ListCreateAPIView):
 
     def perform_create(self, serializer):
         family = self.request.user.membership.family
-        serializer.save(family=family)
+        senior = serializer.save(family=family)
+        # Notify other caregivers
+        from apps.notifications.tasks import dispatch_change_notification
+        dispatch_change_notification.delay(
+            actor_id=str(self.request.user.id),
+            family_id=str(family.id),
+            event_type="senior_added",
+            subject_name=senior.full_name,
+            senior_name=senior.full_name,
+            detail_url=f"/pl/seniors/{senior.id}",
+        )
 
 
 class SeniorDetailView(generics.RetrieveUpdateDestroyAPIView):
@@ -42,4 +52,14 @@ class SeniorDetailView(generics.RetrieveUpdateDestroyAPIView):
         senior = self.get_object()
         senior.is_archived = True
         senior.save()
+        # Notify other caregivers
+        from apps.notifications.tasks import dispatch_change_notification
+        dispatch_change_notification.delay(
+            actor_id=str(request.user.id),
+            family_id=str(senior.family_id),
+            event_type="senior_archived",
+            subject_name=senior.full_name,
+            senior_name=senior.full_name,
+            detail_url=f"/pl/seniors/{senior.id}",
+        )
         return Response(status=204)

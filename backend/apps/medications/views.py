@@ -24,21 +24,24 @@ class MedicationListCreateView(generics.ListCreateAPIView):
         return qs
 
     def create(self, request, *args, **kwargs):
-        print("====== MEDICATION CREATE DEBUG ======")
-        print("REQUEST DATA:", request.data)
-
         serializer = self.get_serializer(data=request.data)
-
         if not serializer.is_valid():
-            print("SERIALIZER ERRORS:", serializer.errors)
             return Response(serializer.errors, status=400)
-
         self.perform_create(serializer)
         return Response(serializer.data, status=201)
 
     def perform_create(self, serializer):
         senior = self._get_senior()
-        serializer.save(senior=senior)
+        med = serializer.save(senior=senior)
+        from apps.notifications.tasks import dispatch_change_notification
+        dispatch_change_notification.delay(
+            actor_id=str(self.request.user.id),
+            family_id=str(senior.family_id),
+            event_type="medication_added",
+            subject_name=med.name,
+            senior_name=senior.full_name,
+            detail_url=f"/pl/seniors/{senior.id}/medications",
+        )
 
 
 class MedicationDetailView(generics.RetrieveUpdateDestroyAPIView):
@@ -50,9 +53,33 @@ class MedicationDetailView(generics.RetrieveUpdateDestroyAPIView):
         senior = Senior.objects.get(pk=self.kwargs["senior_id"], family=family)
         return Medication.objects.filter(senior=senior).prefetch_related("schedules")
 
+    def perform_update(self, serializer):
+        med = serializer.save()
+        senior = med.senior
+        from apps.notifications.tasks import dispatch_change_notification
+        dispatch_change_notification.delay(
+            actor_id=str(self.request.user.id),
+            family_id=str(senior.family_id),
+            event_type="medication_updated",
+            subject_name=med.name,
+            senior_name=senior.full_name,
+            detail_url=f"/pl/seniors/{senior.id}/medications",
+        )
+
     def destroy(self, request, *args, **kwargs):
         """Soft-delete: deactivate instead of delete."""
         medication = self.get_object()
+        senior = medication.senior
+        name = medication.name
         medication.is_active = False
         medication.save()
+        from apps.notifications.tasks import dispatch_change_notification
+        dispatch_change_notification.delay(
+            actor_id=str(request.user.id),
+            family_id=str(senior.family_id),
+            event_type="medication_deleted",
+            subject_name=name,
+            senior_name=senior.full_name,
+            detail_url=f"/pl/seniors/{senior.id}/medications",
+        )
         return Response(status=204)

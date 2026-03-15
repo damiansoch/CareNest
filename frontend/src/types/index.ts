@@ -122,6 +122,49 @@ export interface Appointment {
   updated_at: string;
 }
 
+// ─── Documents ───────────────────────────────────────────────────────────────
+
+export type DocumentCategory =
+  | "medical_report"
+  | "prescription"
+  | "lab_result"
+  | "insurance"
+  | "identity"
+  | "consent_form"
+  | "referral"
+  | "discharge_summary"
+  | "other";
+
+export interface DocumentPageMeta {
+  id: string;
+  page_number: number;
+  mime_type: "image/jpeg" | "image/png" | "application/pdf";
+  file_size: number;
+}
+
+export interface DocumentUploader {
+  id: string;
+  first_name: string;
+  last_name: string;
+}
+
+export interface Document {
+  id: string;
+  name: string;
+  category: DocumentCategory;
+  category_display: string;
+  tags: string[];
+  page_count: number;
+  total_size_bytes: number;
+  uploaded_by: DocumentUploader | null;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface DocumentDetail extends Document {
+  pages: DocumentPageMeta[];
+}
+
 // ─── API pagination ───────────────────────────────────────────────────────────
 
 export interface PaginatedResponse<T> {

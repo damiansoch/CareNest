@@ -39,6 +39,8 @@ LOCAL_APPS = [
     "apps.seniors",
     "apps.medications",
     "apps.appointments",
+    "apps.notifications",
+    "apps.documents",
 ]
 
 INSTALLED_APPS = DJANGO_APPS + THIRD_PARTY_APPS + LOCAL_APPS
@@ -180,9 +182,23 @@ CORS_ALLOW_CREDENTIALS = True
 # ---------------------------------------------------------------------------
 CELERY_BROKER_URL = config("REDIS_URL", default="redis://localhost:6379/0")
 CELERY_RESULT_BACKEND = config("REDIS_URL", default="redis://localhost:6379/0")
-CELERY_TIMEZONE = "UTC"
+CELERY_TIMEZONE = "Europe/Warsaw"
 CELERY_TASK_TRACK_STARTED = True
-CELERY_BEAT_SCHEDULER = "django_celery_beat.schedulers:DatabaseScheduler"
+
+# Use file-based scheduler — no DB polling, lighter than DatabaseScheduler
+CELERY_BEAT_SCHEDULER = "celery.beat:PersistentScheduler"
+CELERY_BEAT_SCHEDULE_FILENAME = "/tmp/celerybeat-schedule"
+# Reduce beat's internal loop interval (default 5s is wasteful for daily tasks)
+CELERY_BEAT_MAX_LOOP_INTERVAL = 300  # re-check every 5 minutes max
+
+from celery.schedules import crontab  # noqa: E402
+CELERY_BEAT_SCHEDULE = {
+    "send-appointment-reminders-daily": {
+        "task": "apps.appointments.tasks.send_appointment_reminders",
+        # Run at 08:00 Warsaw time every day
+        "schedule": crontab(hour=8, minute=0),
+    },
+}
 
 # ---------------------------------------------------------------------------
 # Email

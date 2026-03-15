@@ -2,7 +2,11 @@
   "permissions": {
     "allow": [
       "Bash(test -f \"D:\\\\PyCharmProjects\\\\CareNest\\\\backend\\\\.dockerignore\")",
-      "Bash(python -c \"import secrets; print\\(secrets.token_urlsafe\\(50\\)\\)\")"
+      "Bash(python -c \"import secrets; print\\(secrets.token_urlsafe\\(50\\)\\)\")",
+      "Bash(dir \"D:\\\\PyCharmProjects\\\\CareNest\\\\backend\\\\apps\\\\notifications\")",
+      "Bash(dir \"D:\\\\PyCharmProjects\\\\CareNest\\\\backend\\\\apps\\\\documents\")",
+      "Bash(dir \"D:\\\\PyCharmProjects\\\\CareNest\\\\frontend\\\\src\\\\components\\\\documents\")",
+      "Bash(del \"D:\\\\PyCharmProjects\\\\CareNest\\\\backend\\\\apps\\\\documents\\\\migrations\\\\0001_initial.py\")"
     ]
   }
 }

@@ -6,10 +6,13 @@ import { isFuture, isToday, format, type Locale } from "date-fns";
 import { pl, enUS } from "date-fns/locale";
 import { Plus, Users, Calendar, Printer } from "lucide-react";
 import { useQueries } from "@tanstack/react-query";
+import { motion } from "framer-motion";
 import { AppShell } from "@/components/layout/AppShell";
 import { AuthGuard } from "@/components/layout/AuthGuard";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { CountUp } from "@/components/ui/count-up";
+import { AnimatedList, AnimatedItem } from "@/components/ui/animated-list";
 import { useSeniors } from "@/hooks/useSeniors";
 import { useFamily } from "@/hooks/useFamily";
 import { useAuthStore } from "@/store/auth";
@@ -63,7 +66,13 @@ function DashboardContent({ locale }: { locale: string }) {
 
   return (
     <div>
-      <div className="mb-8">
+      {/* Animated welcome */}
+      <motion.div
+        className="mb-8"
+        initial={{ opacity: 0, y: 16, filter: "blur(6px)" }}
+        animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
+        transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
+      >
         <h1 className="text-3xl font-bold">
           {t("welcome", { name: user?.first_name ?? "" })}
         </h1>
@@ -72,14 +81,36 @@ function DashboardContent({ locale }: { locale: string }) {
             {t("familyName", { name: family.name })}
           </p>
         )}
-      </div>
+      </motion.div>
 
-      {/* Stats */}
-      <div className="grid grid-cols-2 md:grid-cols-3 gap-4 mb-8">
-        <StatCard icon={<Users size={20} className="text-primary" />} label={t("activeSeniors")} value={seniors?.length ?? 0} />
-        <StatCard icon={<Calendar size={20} className="text-primary" />} label={t("todayAppointments")} value={todayAppts.length} />
-        <StatCard icon={<Calendar size={20} className="text-primary" />} label={t("upcomingAppointments")} value={upcomingAppts.length} />
-      </div>
+      {/* Stats with CountUp */}
+      <AnimatedList className="grid grid-cols-2 md:grid-cols-3 gap-4 mb-8">
+        <AnimatedItem>
+          <StatCard
+            icon={<Users size={20} className="text-primary" />}
+            label={t("activeSeniors")}
+            value={seniors?.length ?? 0}
+            gradient="from-blue-500/8 to-indigo-500/4"
+          />
+        </AnimatedItem>
+        <AnimatedItem>
+          <StatCard
+            icon={<Calendar size={20} className="text-primary" />}
+            label={t("todayAppointments")}
+            value={todayAppts.length}
+            gradient="from-violet-500/8 to-purple-500/4"
+            pulse={todayAppts.length > 0}
+          />
+        </AnimatedItem>
+        <AnimatedItem>
+          <StatCard
+            icon={<Calendar size={20} className="text-primary" />}
+            label={t("upcomingAppointments")}
+            value={upcomingAppts.length}
+            gradient="from-sky-500/8 to-cyan-500/4"
+          />
+        </AnimatedItem>
+      </AnimatedList>
 
       {/* Today */}
       <section className="mb-8">
@@ -87,11 +118,13 @@ function DashboardContent({ locale }: { locale: string }) {
         {todayAppts.length === 0 ? (
           <p className="text-sm text-muted-foreground">{t("noTodayAppointments")}</p>
         ) : (
-          <div className="space-y-2">
+          <AnimatedList className="space-y-2">
             {todayAppts.map((a) => (
-              <ApptRow key={a.id} appt={a} locale={locale} dateLocale={dateLocale} />
+              <AnimatedItem key={a.id}>
+                <ApptRow appt={a} locale={locale} dateLocale={dateLocale} />
+              </AnimatedItem>
             ))}
-          </div>
+          </AnimatedList>
         )}
       </section>
 
@@ -99,11 +132,13 @@ function DashboardContent({ locale }: { locale: string }) {
       {upcomingAppts.length > 0 && (
         <section className="mb-8">
           <h2 className="text-lg font-semibold mb-3">{t("upcomingAppointments")}</h2>
-          <div className="space-y-2">
+          <AnimatedList className="space-y-2">
             {upcomingAppts.map((a) => (
-              <ApptRow key={a.id} appt={a} locale={locale} dateLocale={dateLocale} />
+              <AnimatedItem key={a.id}>
+                <ApptRow appt={a} locale={locale} dateLocale={dateLocale} />
+              </AnimatedItem>
             ))}
-          </div>
+          </AnimatedList>
         </section>
       )}
 
@@ -130,13 +165,39 @@ function DashboardContent({ locale }: { locale: string }) {
   );
 }
 
-function StatCard({ icon, label, value }: { icon: React.ReactNode; label: string; value: number }) {
+function StatCard({
+  icon,
+  label,
+  value,
+  gradient,
+  pulse,
+}: {
+  icon: React.ReactNode;
+  label: string;
+  value: number;
+  gradient: string;
+  pulse?: boolean;
+}) {
   return (
-    <Card>
-      <CardContent className="flex items-center gap-3 pt-5">
-        <div className="rounded-lg bg-primary/10 p-2">{icon}</div>
+    <Card className="relative overflow-hidden">
+      {/* Gradient background */}
+      <div className={`absolute inset-0 bg-gradient-to-br ${gradient}`} />
+      <CardContent className="relative flex items-center gap-3 pt-5">
+        <div className="relative rounded-lg bg-primary/10 p-2">
+          {icon}
+          {/* Pulse ring when there's something today */}
+          {pulse && (
+            <motion.div
+              className="absolute inset-0 rounded-lg border-2 border-primary/40"
+              animate={{ scale: [1, 1.5, 1], opacity: [0.7, 0, 0.7] }}
+              transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
+            />
+          )}
+        </div>
         <div>
-          <p className="text-2xl font-bold">{value}</p>
+          <p className="text-2xl font-bold">
+            <CountUp value={value} />
+          </p>
           <p className="text-xs text-muted-foreground">{label}</p>
         </div>
       </CardContent>
@@ -156,7 +217,11 @@ function ApptRow({
   const apptDate = new Date(appt.datetime);
   return (
     <Link href={`/${locale}/seniors/${appt.seniorId}/appointments`}>
-      <div className="flex items-center gap-3 rounded-lg border px-4 py-3 hover:bg-accent/50 transition-colors">
+      <motion.div
+        className="flex items-center gap-3 rounded-lg border px-4 py-3 hover:bg-accent/50 transition-colors"
+        whileHover={{ x: 4 }}
+        transition={{ type: "spring", stiffness: 400, damping: 25 }}
+      >
         <div className="text-center w-12">
           <p className="text-xs text-primary font-medium uppercase">
             {format(apptDate, "MMM", { locale: dateLocale })}
@@ -174,7 +239,7 @@ function ApptRow({
             {format(apptDate, "HH:mm")}
           </p>
         </div>
-      </div>
+      </motion.div>
     </Link>
   );
 }

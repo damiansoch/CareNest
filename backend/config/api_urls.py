@@ -12,10 +12,11 @@ urlpatterns = [
     # Family & team
     path("family/", include("apps.accounts.family_urls")),
 
-    # Seniors, medications, appointments (nested under seniors)
+    # Seniors, medications, appointments, documents (nested under seniors)
     path("seniors/", include("apps.seniors.urls")),
     path("seniors/<uuid:senior_id>/medications/", include("apps.medications.urls")),
     path("seniors/<uuid:senior_id>/appointments/", include("apps.appointments.urls")),
+    path("seniors/<uuid:senior_id>/documents/", include("apps.documents.urls")),
 
     # Family-wide appointment list (all seniors)
     path("appointments/", include("apps.appointments.family_urls")),

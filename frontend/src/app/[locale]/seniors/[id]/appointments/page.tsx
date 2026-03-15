@@ -86,12 +86,16 @@ function AppointmentsContent({ locale, seniorId }: { locale: string; seniorId: s
           <DialogContent title={t("addAppointment")}>
             <AppointmentForm
               onSubmit={async (data) => {
-                const { reminder_24h, reminder_2h, ...rest } = data;
-                await create.mutateAsync({
-                  ...rest,
-                  reminder_configs: buildReminderConfigs(reminder_24h, reminder_2h),
-                });
-                setCreateOpen(false);
+                try {
+                  const { reminder_24h, reminder_2h, ...rest } = data;
+                  await create.mutateAsync({
+                    ...rest,
+                    reminder_configs: buildReminderConfigs(reminder_24h, reminder_2h),
+                  });
+                  setCreateOpen(false);
+                } catch {
+                  // error toast handled by useCreateAppointment onError
+                }
               }}
               onCancel={() => setCreateOpen(false)}
             />
@@ -160,12 +164,16 @@ function AppointmentsContent({ locale, seniorId }: { locale: string; seniorId: s
             <AppointmentForm
               defaultValues={editingAppt}
               onSubmit={async (data) => {
-                const { reminder_24h, reminder_2h, ...rest } = data;
-                await update.mutateAsync({
-                  ...rest,
-                  reminder_configs: buildReminderConfigs(reminder_24h, reminder_2h),
-                });
-                setEditingAppt(null);
+                try {
+                  const { reminder_24h, reminder_2h, ...rest } = data;
+                  await update.mutateAsync({
+                    ...rest,
+                    reminder_configs: buildReminderConfigs(reminder_24h, reminder_2h),
+                  });
+                  setEditingAppt(null);
+                } catch {
+                  // error toast handled by useUpdateAppointment onError
+                }
               }}
               onCancel={() => setEditingAppt(null)}
             />

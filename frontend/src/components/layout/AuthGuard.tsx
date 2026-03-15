@@ -8,12 +8,14 @@ import { PageSpinner } from "@/components/ui/spinner";
 import { useState } from "react";
 
 export function AuthGuard({ children, locale }: { children: React.ReactNode; locale: string }) {
-  const { isAuthenticated, setUser, logout } = useAuthStore();
+  const { isAuthenticated, setUser, logout, _hasHydrated } = useAuthStore();
   const router = useRouter();
   const pathname = usePathname();
   const [checking, setChecking] = useState(true);
 
   useEffect(() => {
+    if (!_hasHydrated) return;
+
     async function verify() {
       if (!isAuthenticated) {
         router.replace(`/${locale}/auth/login`);
@@ -32,7 +34,7 @@ export function AuthGuard({ children, locale }: { children: React.ReactNode; loc
       }
     }
     verify();
-  }, [isAuthenticated, locale, pathname]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [isAuthenticated, locale, pathname, _hasHydrated]); // eslint-disable-line react-hooks/exhaustive-deps
 
   if (checking) return <PageSpinner />;
   if (!isAuthenticated) return null;

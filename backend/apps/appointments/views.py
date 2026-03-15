@@ -27,7 +27,16 @@ class AppointmentListCreateView(generics.ListCreateAPIView):
 
     def perform_create(self, serializer):
         senior = self._get_senior()
-        serializer.save(senior=senior)
+        appt = serializer.save(senior=senior)
+        from apps.notifications.tasks import dispatch_change_notification
+        dispatch_change_notification.delay(
+            actor_id=str(self.request.user.id),
+            family_id=str(senior.family_id),
+            event_type="appointment_created",
+            subject_name=appt.title,
+            senior_name=senior.full_name,
+            detail_url=f"/pl/seniors/{senior.id}/appointments",
+        )
 
 
 class FamilyAppointmentListView(generics.ListAPIView):
@@ -64,3 +73,32 @@ class AppointmentDetailView(generics.RetrieveUpdateDestroyAPIView):
             .prefetch_related("reminder_configs")
             .select_related("assigned_caregiver")
         )
+
+    def perform_update(self, serializer):
+        appt = serializer.save()
+        senior = appt.senior
+        from apps.notifications.tasks import dispatch_change_notification
+        dispatch_change_notification.delay(
+            actor_id=str(self.request.user.id),
+            family_id=str(senior.family_id),
+            event_type="appointment_updated",
+            subject_name=appt.title,
+            senior_name=senior.full_name,
+            detail_url=f"/pl/seniors/{senior.id}/appointments",
+        )
+
+    def destroy(self, request, *args, **kwargs):
+        appt = self.get_object()
+        senior = appt.senior
+        title = appt.title
+        appt.delete()
+        from apps.notifications.tasks import dispatch_change_notification
+        dispatch_change_notification.delay(
+            actor_id=str(request.user.id),
+            family_id=str(senior.family_id),
+            event_type="appointment_deleted",
+            subject_name=title,
+            senior_name=senior.full_name,
+            detail_url=f"/pl/seniors/{senior.id}/appointments",
+        )
+        return Response(status=204)

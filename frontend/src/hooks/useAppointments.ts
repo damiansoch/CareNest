@@ -2,6 +2,7 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { appointmentsApi } from "@/lib/api/endpoints";
 import type { Appointment } from "@/types";
 import { toast } from "@/store/toast";
+import { extractApiErrors } from "@/lib/utils/apiErrors";
 
 export function useAllAppointments() {
   return useQuery({
@@ -33,7 +34,7 @@ export function useCreateAppointment(seniorId: string) {
       qc.invalidateQueries({ queryKey: ["upcoming-appointments"] });
       toast({ title: "Wizyta dodana" });
     },
-    onError: () => toast({ title: "Błąd", description: "Nie udało się dodać wizyty.", variant: "destructive" }),
+    onError: (error) => toast({ title: "Błąd", description: extractApiErrors(error), variant: "destructive" }),
   });
 }
 
@@ -46,7 +47,7 @@ export function useUpdateAppointment(seniorId: string, id: string) {
       qc.invalidateQueries({ queryKey: ["upcoming-appointments"] });
       toast({ title: "Wizyta zaktualizowana" });
     },
-    onError: () => toast({ title: "Błąd", description: "Nie udało się zapisać.", variant: "destructive" }),
+    onError: (error) => toast({ title: "Błąd", description: extractApiErrors(error), variant: "destructive" }),
   });
 }
 
@@ -59,6 +60,6 @@ export function useDeleteAppointment(seniorId: string) {
       qc.invalidateQueries({ queryKey: ["upcoming-appointments"] });
       toast({ title: "Wizyta usunięta" });
     },
-    onError: () => toast({ title: "Błąd", variant: "destructive" }),
+    onError: (error) => toast({ title: "Błąd", description: extractApiErrors(error), variant: "destructive" }),
   });
 }

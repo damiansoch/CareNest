@@ -17,15 +17,17 @@ logger = logging.getLogger(__name__)
 def send_appointment_reminders(self):
     """
     Periodic task: scan upcoming appointments and send due reminder emails.
-    Runs every 15 minutes via Celery Beat.
+    Runs once daily at 08:00 Warsaw time via Celery Beat.
 
     Idempotent: ReminderLog unique constraint prevents duplicate sends.
+    Lookahead of 48 h covers same-day and next-day appointments regardless
+    of when the reminder offset is configured.
     """
     from .models import Appointment, ReminderConfig, ReminderLog
 
     now = timezone.now()
-    # Look ahead far enough to catch 24h reminders
-    lookahead = now + timedelta(hours=25)
+    # 48 h lookahead: catches any reminder offset up to 2 days ahead
+    lookahead = now + timedelta(hours=48)
 
     appointments = (
         Appointment.objects

@@ -101,7 +101,7 @@ class InvitationListCreateView(generics.ListCreateAPIView):
         )
 
         # Send invitation email
-        invite_url = f"{settings.FRONTEND_URL}/register?token={invitation.token}"
+        invite_url = f"{settings.FRONTEND_URL}/pl/auth/register?token={invitation.token}"
         send_mail(
             subject=f"Zaproszenie do CareNest — {family.name}",
             message=(

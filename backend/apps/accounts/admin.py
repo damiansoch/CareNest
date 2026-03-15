@@ -1,5 +1,7 @@
+from django.conf import settings
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
+from django.utils.html import format_html
 from .models import CaregiverMembership, Family, Invitation, User
 
 
@@ -27,6 +29,11 @@ class CaregiverMembershipAdmin(admin.ModelAdmin):
 
 @admin.register(Invitation)
 class InvitationAdmin(admin.ModelAdmin):
-    list_display = ["email", "family", "role", "status", "expires_at"]
+    list_display = ["email", "family", "role", "status", "expires_at", "invitation_link"]
     list_filter = ["status", "role"]
-    readonly_fields = ["token"]
+    readonly_fields = ["token", "invitation_link"]
+
+    @admin.display(description="Invitation URL")
+    def invitation_link(self, obj):
+        url = f"{settings.FRONTEND_URL}/pl/auth/register?token={obj.token}"
+        return format_html('<a href="{}" target="_blank">{}</a>', url, url)

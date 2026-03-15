@@ -1,6 +1,8 @@
 import { apiClient } from "./client";
 import type {
   Appointment,
+  Document,
+  DocumentDetail,
   Family,
   Invitation,
   Medication,
@@ -104,4 +106,41 @@ export const appointmentsApi = {
     ),
   delete: (seniorId: string, id: string) =>
     apiClient.delete(`/seniors/${seniorId}/appointments/${id}/`),
+};
+
+// ─── Documents ─────────────────────────────────────────────────────────────
+
+const API_BASE =
+  (process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:8000/api/v1").replace(/\/$/, "");
+
+export const documentsApi = {
+  list: (
+    seniorId: string,
+    params?: { category?: string; tags?: string; ordering?: string }
+  ) =>
+    apiClient.get<PaginatedResponse<Document>>(
+      `/seniors/${seniorId}/documents/`,
+      { params }
+    ),
+
+  get: (seniorId: string, id: string) =>
+    apiClient.get<DocumentDetail>(`/seniors/${seniorId}/documents/${id}/`),
+
+  upload: (seniorId: string, formData: FormData) =>
+    apiClient.post<Document>(`/seniors/${seniorId}/documents/`, formData, {
+      headers: { "Content-Type": "multipart/form-data" },
+    }),
+
+  update: (
+    seniorId: string,
+    id: string,
+    data: { name?: string; category?: string; tags?: string[] }
+  ) => apiClient.patch<Document>(`/seniors/${seniorId}/documents/${id}/`, data),
+
+  delete: (seniorId: string, id: string) =>
+    apiClient.delete(`/seniors/${seniorId}/documents/${id}/`),
+
+  /** Returns the URL string for fetching raw page binary content. */
+  pageContentUrl: (seniorId: string, docId: string, pageId: string) =>
+    `${API_BASE}/seniors/${seniorId}/documents/${docId}/pages/${pageId}/content/`,
 };
