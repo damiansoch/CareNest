@@ -219,6 +219,7 @@ export function DocumentsSection({ seniorId, locale }: DocumentsSectionProps) {
         seniorId={seniorId}
         open={uploadOpen}
         onClose={() => setUploadOpen(false)}
+        existingTags={knownTags}
       />
     </div>
   );

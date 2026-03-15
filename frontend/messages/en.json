@@ -162,6 +162,8 @@
     "allCategories": "All categories",
     "filterByCategory": "Filter by category",
     "filterByTags": "Filter by tags",
+    "quickTagsLabel": "Already used tags — click to add:",
+    "noExistingTags": "No tags yet. Type a custom one above.",
     "categories": {
       "medical_report": "Medical Report",
       "prescription": "Prescription",

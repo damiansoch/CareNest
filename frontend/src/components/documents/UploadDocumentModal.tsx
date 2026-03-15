@@ -33,12 +33,6 @@ const CATEGORIES: { value: DocumentCategory; label: string }[] = [
   { value: "other",             label: "Inne" },
 ];
 
-const TAG_SUGGESTIONS = [
-  "kardiologia", "neurologia", "ortopedia", "diabetes",
-  "onkologia", "alergologia", "rehabilitacja", "2024", "2025",
-  "pilne", "archiwalne",
-];
-
 interface SelectedFile {
   file: File;
   preview: string | null;
@@ -48,9 +42,10 @@ interface UploadDocumentModalProps {
   seniorId: string;
   open: boolean;
   onClose: () => void;
+  existingTags?: string[];
 }
 
-export function UploadDocumentModal({ seniorId, open, onClose }: UploadDocumentModalProps) {
+export function UploadDocumentModal({ seniorId, open, onClose, existingTags = [] }: UploadDocumentModalProps) {
   const t = useTranslations("documents");
   const upload = useUploadDocument(seniorId);
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -272,7 +267,8 @@ export function UploadDocumentModal({ seniorId, open, onClose }: UploadDocumentM
                     value={tags}
                     onChange={setTags}
                     placeholder={t("tagsPlaceholder")}
-                    suggestions={TAG_SUGGESTIONS}
+                    suggestions={existingTags}
+                    suggestionsLabel={existingTags.length > 0 ? t("quickTagsLabel") : undefined}
                     className="mt-1"
                   />
                 </div>

@@ -10,6 +10,7 @@ interface TagInputProps {
   placeholder?: string;
   className?: string;
   suggestions?: string[];
+  suggestionsLabel?: string;
 }
 
 export function TagInput({
@@ -18,6 +19,7 @@ export function TagInput({
   placeholder = "Wpisz tag...",
   className,
   suggestions = [],
+  suggestionsLabel,
 }: TagInputProps) {
   const [inputValue, setInputValue] = useState("");
 
@@ -91,7 +93,9 @@ export function TagInput({
       {/* Suggestion chips — always visible */}
       {availableSuggestions.length > 0 && (
         <div>
-          <p className="text-[11px] text-muted-foreground mb-1.5">Szybkie tagi — kliknij aby dodać:</p>
+          {suggestionsLabel && (
+            <p className="text-[11px] text-muted-foreground mb-1.5">{suggestionsLabel}</p>
+          )}
           <div className="flex flex-wrap gap-1.5">
             {availableSuggestions.map((s) => (
               <button

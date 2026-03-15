@@ -1,19 +1,14 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useMemo } from "react";
+import { useTranslations } from "next-intl";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { TagInput } from "./TagInput";
-import { useUpdateDocument } from "@/hooks/useDocuments";
+import { useUpdateDocument, useDocuments } from "@/hooks/useDocuments";
 import type { Document } from "@/types";
-
-const TAG_SUGGESTIONS = [
-  "kardiologia", "neurologia", "ortopedia", "diabetes",
-  "onkologia", "alergologia", "rehabilitacja", "2024", "2025",
-  "pilne", "archiwalne",
-];
 
 interface EditDocumentModalProps {
   seniorId: string;
@@ -23,10 +18,18 @@ interface EditDocumentModalProps {
 }
 
 export function EditDocumentModal({ seniorId, document: doc, open, onClose }: EditDocumentModalProps) {
+  const t = useTranslations("documents");
   const update = useUpdateDocument(seniorId);
   const [name, setName] = useState(doc.name);
   const [tags, setTags] = useState<string[]>(doc.tags);
   const [nameError, setNameError] = useState("");
+
+  // Collect all tags used across all documents for this senior (React Query cache — no extra request)
+  const { data: allDocs } = useDocuments(seniorId);
+  const existingTags = useMemo(() => {
+    if (!allDocs) return [];
+    return Array.from(new Set(allDocs.flatMap((d) => d.tags))).sort();
+  }, [allDocs]);
 
   const handleSave = async () => {
     if (!name.trim()) {
@@ -55,12 +58,14 @@ export function EditDocumentModal({ seniorId, document: doc, open, onClose }: Ed
           </div>
 
           <div>
-            <Label>Tagi</Label>
+            <Label>{t("tags")}</Label>
             <div className="mt-1">
               <TagInput
                 value={tags}
                 onChange={setTags}
-                suggestions={TAG_SUGGESTIONS}
+                placeholder={t("tagsPlaceholder")}
+                suggestions={existingTags}
+                suggestionsLabel={existingTags.length > 0 ? t("quickTagsLabel") : undefined}
               />
             </div>
           </div>

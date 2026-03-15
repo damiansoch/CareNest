@@ -162,6 +162,8 @@
     "allCategories": "Wszystkie kategorie",
     "filterByCategory": "Filtruj wg kategorii",
     "filterByTags": "Filtruj wg tagów",
+    "quickTagsLabel": "Tagi już używane — kliknij aby dodać:",
+    "noExistingTags": "Brak tagów. Wpisz własny powyżej.",
     "categories": {
       "medical_report": "Raport medyczny",
       "prescription": "Recepta",
