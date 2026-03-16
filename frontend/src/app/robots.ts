@@ -5,7 +5,6 @@ export default function robots(): MetadataRoute.Robots {
   return {
     rules: [
       {
-        // Allow crawling only the public entry points
         userAgent: "*",
         allow: [
           "/pl/auth/login",
@@ -18,7 +17,6 @@ export default function robots(): MetadataRoute.Robots {
           "/apple-touch-icon.png",
           "/manifest.webmanifest",
         ],
-        // Block all private/authenticated app routes
         disallow: [
           "/pl/seniors/",
           "/pl/tracker/",
@@ -28,11 +26,9 @@ export default function robots(): MetadataRoute.Robots {
           "/en/tracker/",
           "/en/settings/",
           "/en/appointments/",
-          "/api/",
         ],
       },
       {
-        // Block AI training crawlers
         userAgent: [
           "GPTBot",
           "ChatGPT-User",
@@ -40,12 +36,11 @@ export default function robots(): MetadataRoute.Robots {
           "anthropic-ai",
           "Claude-Web",
           "Omgilibot",
-          "FacebookBot",
         ],
         disallow: ["/"],
       },
     ],
     sitemap: `${SITE_URL}/sitemap.xml`,
-    host:    SITE_URL,
+    host: SITE_URL,
   };
 }

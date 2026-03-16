@@ -5,7 +5,14 @@ import { getMessages } from "next-intl/server";
 import { notFound } from "next/navigation";
 import { routing } from "@/i18n/routing";
 import { Providers } from "../providers";
-import { SITE_NAME, SITE_URL, getCopy, canonical, hreflang, ogLocale } from "@/lib/seo";
+import {
+  SITE_NAME,
+  SITE_URL,
+  getCopy,
+  canonical,
+  hreflang,
+  ogLocale,
+} from "@/lib/seo";
 import "../globals.css";
 
 const inter = Inter({
@@ -22,111 +29,113 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   return {
     metadataBase: new URL(SITE_URL),
 
-    // Title template propagates to all child pages
     title: {
       template: `%s | ${SITE_NAME}`,
-      default:  `${SITE_NAME} — ${copy.tagline}`,
+      default: `${SITE_NAME} — ${copy.tagline}`,
     },
+
     description: copy.description,
-    keywords:    copy.keywords as unknown as string[],
+    keywords: copy.keywords as unknown as string[],
 
-    // Authorship
-    authors:          [{ name: SITE_NAME, url: SITE_URL }],
-    creator:          SITE_NAME,
-    publisher:        SITE_NAME,
-    applicationName:  SITE_NAME,
-    generator:        "Next.js",
-    referrer:         "origin-when-cross-origin",
+    authors: [{ name: SITE_NAME, url: SITE_URL }],
+    creator: SITE_NAME,
+    publisher: SITE_NAME,
+    applicationName: SITE_NAME,
+    generator: "Next.js",
+    referrer: "origin-when-cross-origin",
 
-    // Private app — authenticated pages should not be indexed by default.
-    // Individual route layouts override this for public pages (login/register).
     robots: {
-      index:     false,
-      follow:    false,
+      index: false,
+      follow: false,
       googleBot: { index: false, follow: false, noimageindex: true },
     },
 
-    // OpenGraph
     openGraph: {
-      type:            "website",
-      locale:          ogLocale(locale),
+      type: "website",
+      locale: ogLocale(locale),
       alternateLocale: locale === "pl" ? "en_US" : "pl_PL",
-      url:             canonical(locale),
-      siteName:        SITE_NAME,
-      title:           `${SITE_NAME} — ${copy.tagline}`,
-      description:     copy.description,
+      url: canonical(locale),
+      siteName: SITE_NAME,
+      title: `${SITE_NAME} — ${copy.tagline}`,
+      description: copy.description,
       images: [
         {
-          url:    `/api/og?locale=${locale}`,
-          width:  1200,
+          url: "/og-image.png",
+          width: 1200,
           height: 630,
-          alt:    `${SITE_NAME} — ${copy.tagline}`,
-          type:   "image/png",
+          alt: `${SITE_NAME} — ${copy.tagline}`,
+          type: "image/png",
         },
       ],
     },
 
-    // Twitter / X card
     twitter: {
-      card:        "summary_large_image",
-      title:       `${SITE_NAME} — ${copy.tagline}`,
+      card: "summary_large_image",
+      title: `${SITE_NAME} — ${copy.tagline}`,
       description: copy.description,
-      images:      [`/api/og?locale=${locale}`],
+      images: ["/og-image.png"],
     },
 
-    // Canonical + hreflang
     alternates: {
-      canonical:  canonical(locale),
-      languages:  hreflang(),
+      canonical: canonical(locale),
+      languages: hreflang(),
     },
 
-    // Icons
     icons: {
       icon: [
-        { url: "/favicon.ico",        sizes: "any" },
-        { url: "/icon.svg",           type: "image/svg+xml" },
-        { url: "/favicon-16x16.png",  sizes: "16x16", type: "image/png" },
-        { url: "/favicon-32x32.png",  sizes: "32x32", type: "image/png" },
+        { url: "/favicon.ico", sizes: "any" },
+        { url: "/icon.svg", type: "image/svg+xml" },
+        { url: "/favicon-16x16.png", sizes: "16x16", type: "image/png" },
+        { url: "/favicon-32x32.png", sizes: "32x32", type: "image/png" },
       ],
-      apple:    "/apple-touch-icon.png",
+      apple: "/apple-touch-icon.png",
       shortcut: "/favicon.ico",
     },
 
-    // PWA manifest
     manifest: "/manifest.webmanifest",
 
-    // App category
     category: "health",
   };
 }
 
-// ── JSON-LD: WebApplication schema ────────────────────────────────────────────
 function JsonLd({ locale }: { locale: string }) {
   const copy = getCopy(locale);
 
   const schema = {
-    "@context":          "https://schema.org",
-    "@type":             "WebApplication",
-    name:                SITE_NAME,
-    url:                 SITE_URL,
-    description:         copy.description,
+    "@context": "https://schema.org",
+    "@type": "WebApplication",
+    name: SITE_NAME,
+    url: SITE_URL,
+    description: copy.description,
     applicationCategory: "HealthApplication",
-    operatingSystem:     "Web Browser",
-    inLanguage:          ["pl-PL", "en-US"],
+    operatingSystem: "Web Browser",
+    inLanguage: ["pl-PL", "en-US"],
     offers: {
-      "@type":       "Offer",
-      price:         "0",
+      "@type": "Offer",
+      price: "0",
       priceCurrency: "PLN",
     },
     featureList:
       locale === "pl"
-        ? ["Zarządzanie lekami", "Wizyty lekarskie", "Powiadomienia email", "Drukowanie trackerów leków", "Wieloosobowy dostęp"]
-        : ["Medication management", "Medical appointments", "Email reminders", "Printable medication trackers", "Multi-user access"],
-    screenshot: `${SITE_URL}/api/og?locale=${locale}`,
+        ? [
+            "Zarządzanie lekami",
+            "Wizyty lekarskie",
+            "Powiadomienia email",
+            "Drukowanie trackerów leków",
+            "Wieloosobowy dostęp",
+          ]
+        : [
+            "Medication management",
+            "Medical appointments",
+            "Email reminders",
+            "Printable medication trackers",
+            "Multi-user access",
+          ],
+    screenshot: `${SITE_URL}/og-image.png`,
     provider: {
       "@type": "Organization",
-      name:    SITE_NAME,
-      url:     SITE_URL,
+      name: SITE_NAME,
+      url: SITE_URL,
     },
   };
 
@@ -138,7 +147,6 @@ function JsonLd({ locale }: { locale: string }) {
   );
 }
 
-// ── Layout ────────────────────────────────────────────────────────────────────
 export default async function LocaleLayout({
   children,
   params,
@@ -165,7 +173,10 @@ export default async function LocaleLayout({
         <meta name="apple-mobile-web-app-title" content={SITE_NAME} />
         <meta name="msapplication-TileColor" content="#3b82f6" />
       </head>
-      <body className={`${inter.variable} font-sans antialiased bg-background text-foreground`}>
+
+      <body
+        className={`${inter.variable} font-sans antialiased bg-background text-foreground`}
+      >
         <NextIntlClientProvider messages={messages}>
           <Providers>{children}</Providers>
         </NextIntlClientProvider>
