@@ -7,8 +7,8 @@ from .models import Document, DocumentPage
 class DocumentPageInline(admin.TabularInline):
     model = DocumentPage
     extra = 0
-    readonly_fields = ["page_number", "mime_type", "file_size", "created_at"]
-    fields = ["page_number", "mime_type", "file_size", "created_at"]
+    readonly_fields = ["page_number", "mime_type", "file_size", "is_encrypted", "created_at"]
+    fields = ["page_number", "mime_type", "file_size", "is_encrypted", "created_at"]
 
     def has_add_permission(self, request, obj=None):
         return False
@@ -33,9 +33,9 @@ class DocumentAdmin(admin.ModelAdmin):
 
 @admin.register(DocumentPage)
 class DocumentPageAdmin(admin.ModelAdmin):
-    list_display = ["document", "page_number", "mime_type", "file_size_display", "created_at"]
-    list_filter = ["mime_type"]
-    readonly_fields = ["id", "document", "page_number", "mime_type", "file_size", "created_at"]
+    list_display = ["document", "page_number", "mime_type", "file_size_display", "is_encrypted", "created_at"]
+    list_filter = ["mime_type", "is_encrypted"]
+    readonly_fields = ["id", "document", "page_number", "mime_type", "file_size", "is_encrypted", "created_at"]
 
     def file_size_display(self, obj):
         kb = obj.file_size / 1024

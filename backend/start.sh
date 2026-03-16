@@ -3,6 +3,7 @@ set -e
 
 python manage.py collectstatic --noinput
 python manage.py migrate --noinput
+python manage.py encrypt_existing_documents
 
 # Single Celery process: worker + beat combined.
 # --pool=solo    → no forking, single-threaded (~80 MB vs ~200 MB for prefork)
