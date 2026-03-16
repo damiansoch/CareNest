@@ -101,19 +101,24 @@ export interface Medication {
   updated_at: string;
 }
 
-// ─── Appointments ─────────────────────────────────────────────────────────────
+// ─── Appointments / Events ────────────────────────────────────────────────────
 
+export type EventType = "appointment" | "shopping" | "other";
+
+/** offset_hours: 0 = on the day, 48 = 2 days before, 168 = 7 days before */
 export interface ReminderConfig {
   id?: string;
-  offset_hours: 2 | 24;
+  offset_hours: 0 | 48 | 168;
   is_enabled: boolean;
 }
 
 export interface Appointment {
   id: string;
+  event_type: EventType;
   title: string;
   doctor_name: string;
   location: string;
+  url: string;
   datetime: string;
   notes: string;
   assigned_caregiver: User | null;

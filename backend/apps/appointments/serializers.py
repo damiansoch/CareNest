@@ -15,9 +15,11 @@ class AppointmentSerializer(serializers.ModelSerializer):
         model = Appointment
         fields = [
             "id",
+            "event_type",
             "title",
             "doctor_name",
             "location",
+            "url",
             "datetime",
             "notes",
             "assigned_caregiver",
@@ -52,7 +54,7 @@ class AppointmentSerializer(serializers.ModelSerializer):
 
         if configs_data is not None:
             instance.reminder_configs.all().delete()
-            # Also clear reminder logs since the appointment changed
+            # Also clear reminder logs since the event changed
             instance.reminder_logs.all().delete()
             for cfg in configs_data:
                 ReminderConfig.objects.create(appointment=instance, **cfg)

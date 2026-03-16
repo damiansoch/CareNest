@@ -9,16 +9,19 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { FieldError, FormError } from "@/components/ui/error-message";
 import { Spinner } from "@/components/ui/spinner";
-import type { Appointment } from "@/types";
+import type { Appointment, EventType } from "@/types";
 
 const appointmentSchema = z.object({
+  event_type: z.enum(["appointment", "shopping", "other"]),
   title: z.string().min(1),
   doctor_name: z.string().optional(),
   location: z.string().optional(),
+  url: z.string().optional(),
   datetime: z.string().min(1),
   notes: z.string().optional(),
-  reminder_24h: z.boolean(),
-  reminder_2h: z.boolean(),
+  reminder_on_day: z.boolean(),
+  reminder_2d: z.boolean(),
+  reminder_7d: z.boolean(),
 });
 
 type AppointmentFormValues = z.infer<typeof appointmentSchema>;
@@ -33,11 +36,14 @@ export function AppointmentForm({ defaultValues, onSubmit, onCancel }: Appointme
   const t = useTranslations("appointments");
   const tCommon = useTranslations("common");
 
-  const existing24h = defaultValues?.reminder_configs?.some(
-    (r) => r.offset_hours === 24 && r.is_enabled
+  const existingOnDay = defaultValues?.reminder_configs?.some(
+    (r) => r.offset_hours === 0 && r.is_enabled
   );
-  const existing2h = defaultValues?.reminder_configs?.some(
-    (r) => r.offset_hours === 2 && r.is_enabled
+  const existing2d = defaultValues?.reminder_configs?.some(
+    (r) => r.offset_hours === 48 && r.is_enabled
+  );
+  const existing7d = defaultValues?.reminder_configs?.some(
+    (r) => r.offset_hours === 168 && r.is_enabled
   );
 
   // Convert stored UTC datetime to local datetime-local input format
@@ -48,20 +54,28 @@ export function AppointmentForm({ defaultValues, onSubmit, onCancel }: Appointme
   const {
     register,
     handleSubmit,
+    watch,
     setError,
     formState: { errors, isSubmitting },
   } = useForm<AppointmentFormValues>({
     resolver: zodResolver(appointmentSchema),
     defaultValues: {
+      event_type: (defaultValues?.event_type as EventType) ?? "appointment",
       title: defaultValues?.title ?? "",
       doctor_name: defaultValues?.doctor_name ?? "",
       location: defaultValues?.location ?? "",
+      url: defaultValues?.url ?? "",
       datetime: defaultDatetime,
       notes: defaultValues?.notes ?? "",
-      reminder_24h: existing24h ?? true,
-      reminder_2h: existing2h ?? true,
+      reminder_on_day: existingOnDay ?? true,
+      reminder_2d: existing2d ?? true,
+      reminder_7d: existing7d ?? false,
     },
   });
+
+  const eventType = watch("event_type");
+  const isAppointment = eventType === "appointment";
+  const showUrl = eventType === "shopping" || eventType === "other";
 
   async function handleFormSubmit(values: AppointmentFormValues) {
     try {
@@ -73,27 +87,31 @@ export function AppointmentForm({ defaultValues, onSubmit, onCancel }: Appointme
 
   return (
     <form onSubmit={handleSubmit(handleFormSubmit)} className="space-y-4">
+      {/* Event type */}
       <div>
-        <Label htmlFor="title">{t("appointmentTitle")} *</Label>
-        <Input
-          id="title"
-          {...register("title")}
-          error={!!errors.title}
-          className="mt-1"
-          placeholder="np. Wizyta u kardiologa"
-        />
-        <FieldError message={errors.title?.message} />
+        <Label htmlFor="event_type">{t("eventType")} *</Label>
+        <select
+          id="event_type"
+          {...register("event_type")}
+          className="mt-1 flex w-full rounded-lg border border-input bg-background px-3 py-2 text-sm outline-none focus-visible:ring-2 focus-visible:ring-ring"
+        >
+          <option value="appointment">{t("eventTypeAppointment")}</option>
+          <option value="shopping">{t("eventTypeShopping")}</option>
+          <option value="other">{t("eventTypeOther")}</option>
+        </select>
       </div>
 
+      {/* Title + datetime */}
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         <div>
-          <Label htmlFor="doctor_name">{t("doctorName")}</Label>
+          <Label htmlFor="title">{t("appointmentTitle")} *</Label>
           <Input
-            id="doctor_name"
-            {...register("doctor_name")}
+            id="title"
+            {...register("title")}
+            error={!!errors.title}
             className="mt-1"
-            placeholder="np. dr Anna Kowalska"
           />
+          <FieldError message={errors.title?.message} />
         </div>
         <div>
           <Label htmlFor="datetime">{t("datetime")} *</Label>
@@ -108,16 +126,45 @@ export function AppointmentForm({ defaultValues, onSubmit, onCancel }: Appointme
         </div>
       </div>
 
-      <div>
-        <Label htmlFor="location">{t("location")}</Label>
-        <Input
-          id="location"
-          {...register("location")}
-          className="mt-1"
-          placeholder="np. ul. Główna 10, Warszawa"
-        />
-      </div>
+      {/* Appointment-specific fields */}
+      {isAppointment && (
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div>
+            <Label htmlFor="doctor_name">{t("doctorName")}</Label>
+            <Input
+              id="doctor_name"
+              {...register("doctor_name")}
+              className="mt-1"
+              placeholder="np. dr Anna Kowalska"
+            />
+          </div>
+          <div>
+            <Label htmlFor="location">{t("location")}</Label>
+            <Input
+              id="location"
+              {...register("location")}
+              className="mt-1"
+              placeholder="np. ul. Główna 10, Warszawa"
+            />
+          </div>
+        </div>
+      )}
 
+      {/* URL field for shopping / other */}
+      {showUrl && (
+        <div>
+          <Label htmlFor="url">{t("url")}</Label>
+          <Input
+            id="url"
+            type="url"
+            {...register("url")}
+            className="mt-1"
+            placeholder="https://"
+          />
+        </div>
+      )}
+
+      {/* Notes */}
       <div>
         <Label htmlFor="notes">{t("notes")}</Label>
         <textarea
@@ -135,18 +182,26 @@ export function AppointmentForm({ defaultValues, onSubmit, onCancel }: Appointme
           <label className="flex items-center gap-2 cursor-pointer">
             <input
               type="checkbox"
-              {...register("reminder_24h")}
+              {...register("reminder_7d")}
               className="h-4 w-4 rounded border-input"
             />
-            <span className="text-sm">{t("reminder24h")}</span>
+            <span className="text-sm">{t("reminder7d")}</span>
           </label>
           <label className="flex items-center gap-2 cursor-pointer">
             <input
               type="checkbox"
-              {...register("reminder_2h")}
+              {...register("reminder_2d")}
               className="h-4 w-4 rounded border-input"
             />
-            <span className="text-sm">{t("reminder2h")}</span>
+            <span className="text-sm">{t("reminder2d")}</span>
+          </label>
+          <label className="flex items-center gap-2 cursor-pointer">
+            <input
+              type="checkbox"
+              {...register("reminder_on_day")}
+              className="h-4 w-4 rounded border-input"
+            />
+            <span className="text-sm">{t("reminderOnDay")}</span>
           </label>
         </div>
       </div>

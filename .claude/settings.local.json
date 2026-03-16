@@ -15,7 +15,9 @@
       "Bash(cmd //c \"cd D:\\\\PyCharmProjects\\\\CareNest\\\\frontend && npx tsc --noEmit 2>&1\")",
       "Bash(cmd //c \"docker compose up -d frontend 2>&1\")",
       "Bash(cmd //c \"curl -s -o /dev/null -w \"\"%{http_code}\"\" http://localhost:3000/icon.svg && echo \"\"\"\" && curl -s -o /dev/null -w \"\"%{http_code}\"\" http://localhost:3000/icon-192.png && echo \"\"\"\" && curl -s -o /dev/null -w \"\"%{http_code}\"\" http://localhost:3000/favicon.ico\")",
-      "Bash(cmd //c \"curl -s -o nul -w \"\"icon.svg: %{http_code}\\\\n\"\" http://localhost:3000/icon.svg && curl -s -o nul -w \"\"icon-192.png: %{http_code}\\\\n\"\" http://localhost:3000/icon-192.png && curl -s -o nul -w \"\"favicon.ico: %{http_code}\\\\n\"\" http://localhost:3000/favicon.ico && curl -s -o nul -w \"\"favicon-32x32.png: %{http_code}\\\\n\"\" http://localhost:3000/favicon-32x32.png && curl -s -o nul -w \"\"apple-touch-icon.png: %{http_code}\\\\n\"\" http://localhost:3000/apple-touch-icon.png\")"
+      "Bash(cmd //c \"curl -s -o nul -w \"\"icon.svg: %{http_code}\\\\n\"\" http://localhost:3000/icon.svg && curl -s -o nul -w \"\"icon-192.png: %{http_code}\\\\n\"\" http://localhost:3000/icon-192.png && curl -s -o nul -w \"\"favicon.ico: %{http_code}\\\\n\"\" http://localhost:3000/favicon.ico && curl -s -o nul -w \"\"favicon-32x32.png: %{http_code}\\\\n\"\" http://localhost:3000/favicon-32x32.png && curl -s -o nul -w \"\"apple-touch-icon.png: %{http_code}\\\\n\"\" http://localhost:3000/apple-touch-icon.png\")",
+      "Bash(find /d/PyCharmProjects/CareNest/frontend/src/app/[locale]/seniors/[id]/appointments -type f)",
+      "Bash(find /d/PyCharmProjects/CareNest/frontend/src/app/[locale]/appointments -type f)"
     ]
   }
 }

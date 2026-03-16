@@ -4,7 +4,12 @@ from django.utils.translation import gettext_lazy as _
 
 
 class Appointment(models.Model):
-    """A medical appointment for a senior."""
+    """A scheduled event for a senior — medical appointment, shopping/supplies, or other task."""
+
+    class EventType(models.TextChoices):
+        APPOINTMENT = "appointment", _("Medical appointment")
+        SHOPPING = "shopping", _("Shopping / supplies")
+        OTHER = "other", _("Other")
 
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     senior = models.ForeignKey(
@@ -19,9 +24,15 @@ class Appointment(models.Model):
         blank=True,
         related_name="assigned_appointments",
     )
+    event_type = models.CharField(
+        max_length=20,
+        choices=EventType.choices,
+        default=EventType.APPOINTMENT,
+    )
     title = models.CharField(max_length=300)
     doctor_name = models.CharField(max_length=200, blank=True)
     location = models.CharField(max_length=300, blank=True)
+    url = models.URLField(blank=True, help_text=_("Optional link, e.g. shop website"))
     datetime = models.DateTimeField()
     notes = models.TextField(blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
@@ -37,11 +48,12 @@ class Appointment(models.Model):
 
 
 class ReminderConfig(models.Model):
-    """Reminder settings for an appointment."""
+    """Reminder settings for an event. offset_hours encodes days before: 0=same day, 48=2 days, 168=7 days."""
 
     class OffsetChoice(models.IntegerChoices):
-        TWO_HOURS = 2, _("2 hours before")
-        TWENTY_FOUR_HOURS = 24, _("24 hours before")
+        ON_DAY = 0, _("On the day")
+        TWO_DAYS = 48, _("2 days before")
+        ONE_WEEK = 168, _("7 days (1 week) before")
 
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     appointment = models.ForeignKey(

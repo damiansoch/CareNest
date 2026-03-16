@@ -37,11 +37,16 @@ export default function AppointmentsPage({
   );
 }
 
-/** Build reminder_configs array from form checkboxes */
-function buildReminderConfigs(reminder_24h: boolean, reminder_2h: boolean) {
-  const configs: { offset_hours: 2 | 24; is_enabled: boolean }[] = [];
-  if (reminder_24h) configs.push({ offset_hours: 24, is_enabled: true });
-  if (reminder_2h) configs.push({ offset_hours: 2, is_enabled: true });
+/** Convert form reminder checkboxes to reminder_configs array */
+function buildReminderConfigs(
+  reminder_on_day: boolean,
+  reminder_2d: boolean,
+  reminder_7d: boolean,
+) {
+  const configs: { offset_hours: 0 | 48 | 168; is_enabled: boolean }[] = [];
+  if (reminder_7d) configs.push({ offset_hours: 168, is_enabled: true });
+  if (reminder_2d) configs.push({ offset_hours: 48, is_enabled: true });
+  if (reminder_on_day) configs.push({ offset_hours: 0, is_enabled: true });
   return configs;
 }
 
@@ -62,7 +67,7 @@ function AppointmentsContent({ locale, seniorId }: { locale: string; seniorId: s
   const past = appointments?.filter((a) => isPast(new Date(a.datetime))) ?? [];
 
   function handleDelete(id: string) {
-    if (confirm("Czy na pewno chcesz usunąć tę wizytę?")) {
+    if (confirm(t("deleteConfirm"))) {
       deleteAppt.mutate(id);
     }
   }
@@ -87,10 +92,10 @@ function AppointmentsContent({ locale, seniorId }: { locale: string; seniorId: s
             <AppointmentForm
               onSubmit={async (data) => {
                 try {
-                  const { reminder_24h, reminder_2h, ...rest } = data;
+                  const { reminder_on_day, reminder_2d, reminder_7d, ...rest } = data;
                   await create.mutateAsync({
                     ...rest,
-                    reminder_configs: buildReminderConfigs(reminder_24h, reminder_2h),
+                    reminder_configs: buildReminderConfigs(reminder_on_day, reminder_2d, reminder_7d),
                   });
                   setCreateOpen(false);
                 } catch {
@@ -165,10 +170,10 @@ function AppointmentsContent({ locale, seniorId }: { locale: string; seniorId: s
               defaultValues={editingAppt}
               onSubmit={async (data) => {
                 try {
-                  const { reminder_24h, reminder_2h, ...rest } = data;
+                  const { reminder_on_day, reminder_2d, reminder_7d, ...rest } = data;
                   await update.mutateAsync({
                     ...rest,
-                    reminder_configs: buildReminderConfigs(reminder_24h, reminder_2h),
+                    reminder_configs: buildReminderConfigs(reminder_on_day, reminder_2d, reminder_7d),
                   });
                   setEditingAppt(null);
                 } catch {

@@ -2,10 +2,10 @@
 
 import { useTranslations } from "next-intl";
 import Link from "next/link";
-import { Calendar } from "lucide-react";
+import { Calendar, ShoppingCart, CalendarDays } from "lucide-react";
 import { isFuture, isPast, format, type Locale } from "date-fns";
 import { pl, enUS } from "date-fns/locale";
-import { Clock, MapPin, User, Bell } from "lucide-react";
+import { Clock, MapPin, User, Bell, Link as LinkIcon } from "lucide-react";
 import { AppShell } from "@/components/layout/AppShell";
 import { AuthGuard } from "@/components/layout/AuthGuard";
 import { Card, CardContent } from "@/components/ui/card";
@@ -101,9 +101,17 @@ function AppointmentRow({
   locale: string;
   dateLocale: Locale;
 }) {
+  const t = useTranslations("appointments");
   const apptDate = new Date(appointment.datetime);
   const isUpcoming = isFuture(apptDate);
   const hasReminders = appointment.reminder_configs.some((r) => r.is_enabled);
+
+  const TypeIcon = appointment.event_type === "shopping" ? ShoppingCart : CalendarDays;
+  const typeLabel = {
+    appointment: t("eventTypeAppointment"),
+    shopping: t("eventTypeShopping"),
+    other: t("eventTypeOther"),
+  }[appointment.event_type];
 
   return (
     <Link href={`/${locale}/seniors/${appointment.senior_id}/appointments`}>
@@ -123,12 +131,18 @@ function AppointmentRow({
             {/* Details */}
             <div className="flex-1 min-w-0">
               <div className="flex items-center gap-2 flex-wrap">
+                <TypeIcon size={13} className="text-muted-foreground flex-shrink-0" />
                 <h3 className="font-semibold text-sm">{appointment.title}</h3>
                 <Badge variant="outline" className="text-xs font-normal">
                   {appointment.senior_name}
                 </Badge>
+                <Badge variant="secondary" className="text-xs font-normal">
+                  {typeLabel}
+                </Badge>
                 {!isUpcoming && (
-                  <Badge variant="secondary" className="text-xs">Przeszła</Badge>
+                  <Badge variant="secondary" className="text-xs">
+                    {locale === "pl" ? "Przeszłe" : "Past"}
+                  </Badge>
                 )}
                 {isUpcoming && hasReminders && (
                   <Bell size={12} className="text-primary" />
@@ -152,6 +166,12 @@ function AppointmentRow({
                   <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
                     <MapPin size={11} />
                     {appointment.location}
+                  </div>
+                )}
+                {appointment.url && (
+                  <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
+                    <LinkIcon size={11} />
+                    <span className="truncate max-w-[240px]">{appointment.url}</span>
                   </div>
                 )}
               </div>

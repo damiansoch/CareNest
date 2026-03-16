@@ -3,7 +3,7 @@
 import { useTranslations } from "next-intl";
 import { format, isPast, isFuture } from "date-fns";
 import { pl, enUS } from "date-fns/locale";
-import { MapPin, User, Clock, Bell, Pencil, Trash2 } from "lucide-react";
+import { MapPin, User, Clock, Bell, Pencil, Trash2, Link, ShoppingCart, CalendarDays } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -16,6 +16,12 @@ interface AppointmentCardProps {
   onDelete: (id: string) => void;
 }
 
+const EVENT_TYPE_ICONS = {
+  appointment: CalendarDays,
+  shopping: ShoppingCart,
+  other: CalendarDays,
+} as const;
+
 export function AppointmentCard({ appointment, locale, onEdit, onDelete }: AppointmentCardProps) {
   const t = useTranslations("appointments");
   const tCommon = useTranslations("common");
@@ -24,6 +30,13 @@ export function AppointmentCard({ appointment, locale, onEdit, onDelete }: Appoi
   const apptDate = new Date(appointment.datetime);
   const isUpcoming = isFuture(apptDate);
   const hasReminders = appointment.reminder_configs.some((r) => r.is_enabled);
+  const TypeIcon = EVENT_TYPE_ICONS[appointment.event_type] ?? CalendarDays;
+
+  const typeLabel = {
+    appointment: t("eventTypeAppointment"),
+    shopping: t("eventTypeShopping"),
+    other: t("eventTypeOther"),
+  }[appointment.event_type];
 
   return (
     <Card className={isUpcoming ? "" : "opacity-70"}>
@@ -42,9 +55,13 @@ export function AppointmentCard({ appointment, locale, onEdit, onDelete }: Appoi
           {/* Details */}
           <div className="flex-1 min-w-0">
             <div className="flex items-center gap-2 flex-wrap">
+              <TypeIcon size={13} className="text-muted-foreground flex-shrink-0" />
               <h3 className="font-semibold text-sm">{appointment.title}</h3>
+              <Badge variant="outline" className="text-xs font-normal">{typeLabel}</Badge>
               {!isUpcoming && (
-                <Badge variant="secondary" className="text-xs">Przeszła</Badge>
+                <Badge variant="secondary" className="text-xs">
+                  {locale === "pl" ? "Przeszłe" : "Past"}
+                </Badge>
               )}
               {isUpcoming && hasReminders && (
                 <Bell size={12} className="text-primary" />
@@ -56,7 +73,7 @@ export function AppointmentCard({ appointment, locale, onEdit, onDelete }: Appoi
                 <Clock size={11} />
                 {format(apptDate, "HH:mm", { locale: dateLocale })}
                 {" — "}
-                {format(apptDate, locale === "pl" ? "d MMMM yyyy" : "d MMMM yyyy", { locale: dateLocale })}
+                {format(apptDate, "d MMMM yyyy", { locale: dateLocale })}
               </div>
               {appointment.doctor_name && (
                 <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
@@ -68,6 +85,20 @@ export function AppointmentCard({ appointment, locale, onEdit, onDelete }: Appoi
                 <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
                   <MapPin size={11} />
                   {appointment.location}
+                </div>
+              )}
+              {appointment.url && (
+                <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
+                  <Link size={11} />
+                  <a
+                    href={appointment.url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="underline hover:text-foreground truncate max-w-[220px]"
+                    onClick={(e) => e.stopPropagation()}
+                  >
+                    {appointment.url}
+                  </a>
                 </div>
               )}
             </div>

@@ -1,5 +1,10 @@
 """
-Celery tasks for appointment reminder emails.
+Celery tasks for appointment/event reminder emails.
+
+Reminder schedule (checked once daily at 08:00 Warsaw time):
+  offset_hours=168 → send when event is exactly 7 days away (today + 7)
+  offset_hours=48  → send when event is exactly 2 days away (today + 2)
+  offset_hours=0   → send on the day of the event (today)
 """
 import logging
 from datetime import timedelta
@@ -12,58 +17,70 @@ from django.utils import timezone
 
 logger = logging.getLogger(__name__)
 
+# Maps offset_hours value → how many days before the event to send
+_OFFSET_TO_DAYS = {
+    0: 0,    # on the day
+    48: 2,   # 2 days before
+    168: 7,  # 7 days (1 week) before
+}
+
 
 @shared_task(bind=True, max_retries=3, default_retry_delay=60)
 def send_appointment_reminders(self):
     """
-    Periodic task: scan upcoming appointments and send due reminder emails.
+    Periodic task: send due reminder emails for upcoming events.
     Runs once daily at 08:00 Warsaw time via Celery Beat.
 
+    For each enabled offset (on the day / 2 days before / 7 days before) we
+    look for events whose date matches today + N days. This is reliable because
+    the task runs daily — no need for a sliding time-window.
+
     Idempotent: ReminderLog unique constraint prevents duplicate sends.
-    Lookahead of 48 h covers same-day and next-day appointments regardless
-    of when the reminder offset is configured.
     """
-    from .models import Appointment, ReminderConfig, ReminderLog
+    from .models import Appointment, ReminderLog
 
-    now = timezone.now()
-    # 48 h lookahead: catches any reminder offset up to 2 days ahead
-    lookahead = now + timedelta(hours=48)
+    # Use local date in Warsaw timezone (same tz as Celery Beat schedule)
+    local_now = timezone.localtime(timezone.now())
+    today = local_now.date()
 
-    appointments = (
-        Appointment.objects
-        .filter(datetime__gte=now, datetime__lte=lookahead)
-        .prefetch_related(
-            "reminder_configs",
-            "reminder_logs",
-            "senior",
-            "senior__family__memberships__user",
+    for offset_hours, days_before in _OFFSET_TO_DAYS.items():
+        target_date = today + timedelta(days=days_before)
+
+        appointments = (
+            Appointment.objects
+            .filter(datetime__date=target_date)
+            .prefetch_related(
+                "reminder_configs",
+                "reminder_logs",
+                "senior",
+                "senior__family__memberships__user",
+            )
+            .select_related("assigned_caregiver", "senior")
         )
-        .select_related("assigned_caregiver", "senior")
-    )
 
-    for appointment in appointments:
-        for config in appointment.reminder_configs.filter(is_enabled=True):
-            send_time = appointment.datetime - timedelta(hours=config.offset_hours)
+        for appointment in appointments:
+            config = appointment.reminder_configs.filter(
+                offset_hours=offset_hours,
+                is_enabled=True,
+            ).first()
 
-            if now < send_time:
-                # Not yet time to send
+            if not config:
                 continue
 
-            # Check if already sent (unique constraint is the true guard)
             already_sent = appointment.reminder_logs.filter(
-                offset_hours=config.offset_hours,
+                offset_hours=offset_hours,
                 status=ReminderLog.Status.SENT,
             ).exists()
 
             if already_sent:
                 continue
 
-            _dispatch_reminder_email(appointment, config.offset_hours)
+            _dispatch_reminder_email(appointment, offset_hours)
 
 
 def _dispatch_reminder_email(appointment, offset_hours):
     """Send a single reminder email and log the result."""
-    from .models import ReminderLog
+    from .models import Appointment, ReminderLog
 
     senior = appointment.senior
     family = senior.family
@@ -78,32 +95,81 @@ def _dispatch_reminder_email(appointment, offset_hours):
         admin_emails.append(appointment.assigned_caregiver.email)
     recipients = list(set(admin_emails))
 
-    subject = (
-        f"Przypomnienie: {appointment.title} — {senior.full_name}"
-        if senior.preferred_language == "pl"
-        else f"Reminder: {appointment.title} — {senior.full_name}"
+    days_before = _OFFSET_TO_DAYS.get(offset_hours, 0)
+    event_date_str = appointment.datetime.strftime(
+        "%d.%m.%Y %H:%M" if senior.preferred_language == "pl" else "%Y-%m-%d %H:%M"
     )
 
-    if senior.preferred_language == "pl":
-        body = (
-            f"Przypomnienie o wizycie lekarskiej:\n\n"
-            f"Pacjent: {senior.full_name}\n"
-            f"Tytuł: {appointment.title}\n"
-            f"Lekarz: {appointment.doctor_name or '—'}\n"
-            f"Lokalizacja: {appointment.location or '—'}\n"
-            f"Data i godzina: {appointment.datetime.strftime('%d.%m.%Y %H:%M')}\n"
-            f"Notatki: {appointment.notes or '—'}\n"
-        )
+    is_pl = senior.preferred_language == "pl"
+    event_type = appointment.event_type
+
+    # ── Subject ──────────────────────────────────────────────────────────────
+    if is_pl:
+        if days_before == 0:
+            timing = "Dziś"
+        elif days_before == 2:
+            timing = "Za 2 dni"
+        else:
+            timing = "Za 7 dni"
+        subject = f"Przypomnienie ({timing}): {appointment.title} — {senior.full_name}"
     else:
-        body = (
-            f"Appointment reminder:\n\n"
-            f"Patient: {senior.full_name}\n"
-            f"Title: {appointment.title}\n"
-            f"Doctor: {appointment.doctor_name or '—'}\n"
-            f"Location: {appointment.location or '—'}\n"
-            f"Date & time: {appointment.datetime.strftime('%Y-%m-%d %H:%M')}\n"
-            f"Notes: {appointment.notes or '—'}\n"
-        )
+        if days_before == 0:
+            timing = "Today"
+        elif days_before == 2:
+            timing = "In 2 days"
+        else:
+            timing = "In 7 days"
+        subject = f"Reminder ({timing}): {appointment.title} — {senior.full_name}"
+
+    # ── Body ─────────────────────────────────────────────────────────────────
+    if is_pl:
+        type_labels = {
+            Appointment.EventType.APPOINTMENT: "Wizyta lekarska",
+            Appointment.EventType.SHOPPING: "Zakupy / zaopatrzenie",
+            Appointment.EventType.OTHER: "Inne",
+        }
+        type_label = type_labels.get(event_type, event_type)
+        body_lines = [
+            f"Przypomnienie o nadchodzącym zdarzeniu:\n",
+            f"Podopieczny: {senior.full_name}",
+            f"Rodzaj: {type_label}",
+            f"Tytuł: {appointment.title}",
+            f"Data i godzina: {event_date_str}",
+        ]
+        if event_type == Appointment.EventType.APPOINTMENT:
+            if appointment.doctor_name:
+                body_lines.append(f"Lekarz: {appointment.doctor_name}")
+            if appointment.location:
+                body_lines.append(f"Lokalizacja: {appointment.location}")
+        if appointment.url:
+            body_lines.append(f"Link: {appointment.url}")
+        if appointment.notes:
+            body_lines.append(f"Notatki: {appointment.notes}")
+    else:
+        type_labels = {
+            Appointment.EventType.APPOINTMENT: "Medical appointment",
+            Appointment.EventType.SHOPPING: "Shopping / supplies",
+            Appointment.EventType.OTHER: "Other",
+        }
+        type_label = type_labels.get(event_type, event_type)
+        body_lines = [
+            f"Reminder for an upcoming event:\n",
+            f"Person in care: {senior.full_name}",
+            f"Type: {type_label}",
+            f"Title: {appointment.title}",
+            f"Date & time: {event_date_str}",
+        ]
+        if event_type == Appointment.EventType.APPOINTMENT:
+            if appointment.doctor_name:
+                body_lines.append(f"Doctor: {appointment.doctor_name}")
+            if appointment.location:
+                body_lines.append(f"Location: {appointment.location}")
+        if appointment.url:
+            body_lines.append(f"Link: {appointment.url}")
+        if appointment.notes:
+            body_lines.append(f"Notes: {appointment.notes}")
+
+    body = "\n".join(body_lines)
 
     try:
         send_mail(
@@ -119,14 +185,15 @@ def _dispatch_reminder_email(appointment, offset_hours):
             status=ReminderLog.Status.SENT,
         )
         logger.info(
-            "Reminder sent for appointment %s (%dh before)",
+            "Reminder sent for event %s (offset %dh / %d days before)",
             appointment.id,
             offset_hours,
+            days_before,
         )
     except IntegrityError:
         # Race condition: another worker already sent this. Safe to ignore.
         logger.warning(
-            "Duplicate reminder blocked for appointment %s (%dh)",
+            "Duplicate reminder blocked for event %s (offset %dh)",
             appointment.id,
             offset_hours,
         )
@@ -140,7 +207,7 @@ def _dispatch_reminder_email(appointment, offset_hours):
             },
         )
         logger.error(
-            "Failed to send reminder for appointment %s: %s",
+            "Failed to send reminder for event %s: %s",
             appointment.id,
             exc,
         )
