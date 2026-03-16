@@ -13,16 +13,17 @@ export const SITE_URL = (
 const PL = {
   tagline: "Platforma opieki rodzinnej",
   description:
-    "CareNest to platforma dla rodzin sprawujących opiekę nad seniorami. Zarządzaj lekami, wizytami lekarskimi i zespołem opiekunów w jednym miejscu.",
+    "CareNest to platforma dla rodzin sprawujących opiekę nad bliskimi. Zarządzaj lekami, wizytami lekarskimi i zespołem opiekunów w jednym miejscu — niezależnie od wieku i stanu zdrowia podopiecznego.",
   keywords: [
-    "opieka nad seniorem",
+    "opieka nad bliskim",
+    "opieka nad dzieckiem",
     "zarządzanie lekami",
     "wizyty lekarskie",
     "opiekun",
     "platforma rodzinna",
     "CareNest",
     "opieka zdrowotna",
-    "senior",
+    "podopieczny",
   ],
 
   pages: {
@@ -39,15 +40,15 @@ const PL = {
     dashboard: {
       title: "Pulpit",
       description:
-        "Przegląd podopiecznych, nadchodzących wizyt i aktywnych leków.",
+        "Przegląd podopiecznych, nadchodzących wizyt i aktywnych leków dla wszystkich osób pod opieką.",
     },
     seniors: {
       title: "Podopieczni",
-      description: "Lista podopiecznych przypisanych do Twojej rodziny.",
+      description: "Lista osób pod opieką przypisanych do Twojej rodziny.",
     },
     seniorDetail: {
       title: "Profil podopiecznego",
-      description: "Szczegółowe informacje, leki i wizyty podopiecznego.",
+      description: "Szczegółowe informacje, leki i wizyty osoby pod opieką.",
     },
     newSenior: {
       title: "Dodaj podopiecznego",
@@ -56,15 +57,15 @@ const PL = {
     },
     editSenior: {
       title: "Edytuj podopiecznego",
-      description: "Zaktualizuj dane podopiecznego.",
+      description: "Zaktualizuj dane osoby pod opieką.",
     },
     medications: {
       title: "Leki",
-      description: "Plan leków i harmonogram dawkowania podopiecznego.",
+      description: "Plan leków i harmonogram dawkowania osoby pod opieką.",
     },
     appointments: {
       title: "Wizyty lekarskie",
-      description: "Nadchodzące i poprzednie wizyty lekarskie podopiecznego.",
+      description: "Nadchodzące i poprzednie wizyty lekarskie osoby pod opieką.",
     },
     tracker: {
       title: "Tracker leków",
@@ -85,16 +86,18 @@ const PL = {
 const EN = {
   tagline: "Family Caregiving Platform",
   description:
-    "CareNest is a platform for families caring for seniors. Manage medications, medical appointments and your caregiving team all in one place.",
+    "CareNest is a platform for families caring for loved ones of any age — from young children to elderly parents. Manage medications, medical appointments and your caregiving team all in one place.",
   keywords: [
-    "senior care",
+    "caregiver platform",
     "medication management",
     "medical appointments",
     "caregiver",
     "family platform",
     "CareNest",
     "healthcare",
-    "elderly care",
+    "child care",
+    "home care",
+    "disability care",
   ],
 
   pages: {
@@ -110,32 +113,32 @@ const EN = {
     dashboard: {
       title: "Dashboard",
       description:
-        "Overview of seniors, upcoming appointments and active medications.",
+        "Overview of people in your care, upcoming appointments and active medications.",
     },
     seniors: {
-      title: "Seniors",
-      description: "List of seniors assigned to your family.",
+      title: "People in Care",
+      description: "List of people in your care assigned to your family.",
     },
     seniorDetail: {
-      title: "Senior Profile",
+      title: "Care Profile",
       description:
-        "Detailed information, medications and appointments for the senior.",
+        "Detailed information, medications and appointments for the person in care.",
     },
     newSenior: {
-      title: "Add Senior",
+      title: "Add Person",
       description: "Add a new person under care to your family in CareNest.",
     },
     editSenior: {
-      title: "Edit Senior",
-      description: "Update the senior's details.",
+      title: "Edit Person",
+      description: "Update the person's care details.",
     },
     medications: {
       title: "Medications",
-      description: "Medication plan and dosage schedule for the senior.",
+      description: "Medication plan and dosage schedule for the person in care.",
     },
     appointments: {
       title: "Appointments",
-      description: "Upcoming and past medical appointments for the senior.",
+      description: "Upcoming and past medical appointments for the person in care.",
     },
     tracker: {
       title: "Medication Tracker",
@@ -148,7 +151,7 @@ const EN = {
     },
     allAppointments: {
       title: "All Appointments",
-      description: "Overview of upcoming appointments for all seniors.",
+      description: "Overview of upcoming appointments for all people in care.",
     },
   },
 } as const;

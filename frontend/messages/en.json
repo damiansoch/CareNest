@@ -21,7 +21,7 @@
   },
   "nav": {
     "dashboard": "Dashboard",
-    "seniors": "Seniors",
+    "seniors": "People in Care",
     "medications": "Medications",
     "appointments": "Appointments",
     "team": "Team",
@@ -46,9 +46,9 @@
     "joinFamily": "Join a family via invitation"
   },
   "seniors": {
-    "title": "Seniors",
-    "addSenior": "Add senior",
-    "editSenior": "Edit senior",
+    "title": "People in Care",
+    "addSenior": "Add person",
+    "editSenior": "Edit person",
     "firstName": "First name",
     "lastName": "Last name",
     "dateOfBirth": "Date of birth",
@@ -57,8 +57,8 @@
     "photo": "Photo",
     "archived": "Archived",
     "showArchived": "Show archived",
-    "noSeniors": "No seniors yet. Add your first senior.",
-    "archiveConfirm": "Are you sure you want to archive this senior?"
+    "noSeniors": "No one in care yet. Add your first person.",
+    "archiveConfirm": "Are you sure you want to archive this person?"
   },
   "medications": {
     "title": "Medications",
@@ -114,7 +114,7 @@
   "tracker": {
     "title": "Daily Medication Plan",
     "date": "Date",
-    "seniorName": "Senior",
+    "seniorName": "Person in care",
     "medicationTaken": "Medication taken",
     "notes": "Notes",
     "printTracker": "Print plan",
@@ -181,10 +181,10 @@
     "familyName": "Family {name}",
     "todayAppointments": "Today's appointments",
     "upcomingAppointments": "Upcoming appointments",
-    "activeSeniors": "Active seniors",
+    "activeSeniors": "Active people in care",
     "noTodayAppointments": "No appointments today.",
     "quickActions": "Quick actions",
-    "addSenior": "Add senior",
+    "addSenior": "Add person",
     "addAppointment": "Add appointment",
     "printTracker": "Print medication plan"
   }
