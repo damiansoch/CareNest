@@ -67,7 +67,6 @@ def send_change_notification(
     recipients = list(
         CaregiverMembership.objects
         .filter(family_id=family_id)
-        .exclude(user_id=actor_id)
         .select_related("user")
         .values_list("user__email", "user__preferred_language", named=True)
     )

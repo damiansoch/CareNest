@@ -85,15 +85,12 @@ def _dispatch_reminder_email(appointment, offset_hours):
     senior = appointment.senior
     family = senior.family
 
-    # Recipients: all admin caregivers + assigned caregiver (deduplicated)
-    admin_emails = list(
+    # Recipients: everyone in the family (all roles)
+    recipients = list(
         family.memberships
-        .filter(role="admin")
         .values_list("user__email", flat=True)
+        .distinct()
     )
-    if appointment.assigned_caregiver:
-        admin_emails.append(appointment.assigned_caregiver.email)
-    recipients = list(set(admin_emails))
 
     days_before = _OFFSET_TO_DAYS.get(offset_hours, 0)
     event_date_str = appointment.datetime.strftime(
