@@ -32,7 +32,7 @@ class Appointment(models.Model):
     title = models.CharField(max_length=300)
     doctor_name = models.CharField(max_length=200, blank=True)
     location = models.CharField(max_length=300, blank=True)
-    url = models.URLField(blank=True, help_text=_("Optional link, e.g. shop website"))
+    url = models.URLField(max_length=2000, blank=True, help_text=_("Optional link, e.g. shop website"))
     datetime = models.DateTimeField()
     notes = models.TextField(blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
