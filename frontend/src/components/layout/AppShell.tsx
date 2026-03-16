@@ -50,7 +50,12 @@ export function AppShell({
   const NavLinks = ({ onNavigate }: { onNavigate?: () => void }) => (
     <nav className="flex flex-col gap-1">
       {navItems.map((item) => {
-        const isActive = pathname === item.href || pathname.startsWith(item.href + "/");
+        // Dashboard href is `/${locale}` — use exact match only so it doesn't
+        // appear active on every sub-page (all paths start with `/${locale}/`).
+        const isActive =
+          item.href === `/${locale}`
+            ? pathname === item.href
+            : pathname === item.href || pathname.startsWith(item.href + "/");
         return (
           <Link
             key={item.href}
@@ -131,7 +136,7 @@ export function AppShell({
               <span className="truncate">{user.first_name} {user.last_name}</span>
               <button
                 onClick={logout}
-                className="ml-2 p-1 rounded hover:text-destructive transition-colors"
+                className="ml-2 p-2 rounded-lg hover:text-destructive hover:bg-accent transition-colors"
                 aria-label={t("logout")}
               >
                 <LogOut size={16} />
@@ -157,7 +162,7 @@ export function AppShell({
         <button
           onClick={() => setMobileOpen((v) => !v)}
           aria-label="Toggle menu"
-          className="p-1"
+          className="p-2 rounded-lg hover:bg-accent transition-colors"
         >
           <AnimatePresence mode="wait" initial={false}>
             {mobileOpen ? (

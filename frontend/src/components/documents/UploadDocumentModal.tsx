@@ -161,13 +161,13 @@ export function UploadDocumentModal({ seniorId, open, onClose, existingTags = []
                 onDrop={handleDrop}
                 onClick={() => fileInputRef.current?.click()}
                 className={cn(
-                  "border-2 border-dashed rounded-xl p-8 text-center cursor-pointer transition-all",
+                  "border-2 border-dashed rounded-xl p-5 sm:p-8 text-center cursor-pointer transition-all",
                   isDragging
                     ? "border-primary bg-primary/5"
                     : "border-muted-foreground/25 hover:border-primary/50 hover:bg-accent/30"
                 )}
               >
-                <Upload size={28} className="mx-auto text-muted-foreground mb-2" />
+                <Upload size={22} className="mx-auto text-muted-foreground mb-2 sm:w-7 sm:h-7" />
                 <p className="text-sm font-medium">{t("dropFilesHere")}</p>
                 <p className="text-xs text-muted-foreground mt-1">{t("supportedFormats")}</p>
                 <input

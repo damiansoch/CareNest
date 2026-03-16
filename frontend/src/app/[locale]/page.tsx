@@ -84,7 +84,7 @@ function DashboardContent({ locale }: { locale: string }) {
       </motion.div>
 
       {/* Stats with CountUp */}
-      <AnimatedList className="grid grid-cols-2 md:grid-cols-3 gap-4 mb-8">
+      <AnimatedList className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 mb-8">
         <AnimatedItem>
           <StatCard
             icon={<Users size={20} className="text-primary" />}
@@ -222,7 +222,7 @@ function ApptRow({
         whileHover={{ x: 4 }}
         transition={{ type: "spring", stiffness: 400, damping: 25 }}
       >
-        <div className="text-center w-12">
+        <div className="text-center w-10 sm:w-12">
           <p className="text-xs text-primary font-medium uppercase">
             {format(apptDate, "MMM", { locale: dateLocale })}
           </p>

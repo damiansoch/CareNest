@@ -55,7 +55,7 @@ function SeniorDetailContent({ locale, id }: { locale: string; id: string }) {
   return (
     <div>
       {/* Header */}
-      <div className="flex items-center gap-3 mb-6">
+      <div className="flex items-center gap-3 mb-6 flex-wrap">
         <Link href={`/${locale}/seniors`}>
           <Button variant="ghost" size="icon">
             <ArrowLeft size={18} />
@@ -79,7 +79,7 @@ function SeniorDetailContent({ locale, id }: { locale: string; id: string }) {
       </div>
 
       {/* Details */}
-      <div className="grid gap-4 md:grid-cols-3 mb-6">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
         <Card>
           <CardContent className="pt-5">
             <p className="text-sm text-muted-foreground mb-1">{t("dateOfBirth")}</p>
@@ -108,7 +108,7 @@ function SeniorDetailContent({ locale, id }: { locale: string; id: string }) {
 
       {/* Navigation cards */}
       {!senior.is_archived && (
-        <div className="grid gap-4 sm:grid-cols-3">
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
           <Link href={`/${locale}/seniors/${id}/medications`}>
             <Card className="hover:shadow-md transition-shadow cursor-pointer">
               <CardHeader>

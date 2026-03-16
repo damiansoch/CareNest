@@ -84,7 +84,7 @@ export function AppointmentCard({ appointment, locale, onEdit, onDelete }: Appoi
             <Button
               variant="ghost"
               size="icon"
-              className="h-7 w-7"
+              className="h-9 w-9 md:h-7 md:w-7"
               onClick={() => onEdit(appointment)}
               title={tCommon("edit")}
             >
@@ -93,7 +93,7 @@ export function AppointmentCard({ appointment, locale, onEdit, onDelete }: Appoi
             <Button
               variant="ghost"
               size="icon"
-              className="h-7 w-7 text-muted-foreground hover:text-destructive"
+              className="h-9 w-9 md:h-7 md:w-7 text-muted-foreground hover:text-destructive"
               onClick={() => onDelete(appointment.id)}
               title={tCommon("delete")}
             >

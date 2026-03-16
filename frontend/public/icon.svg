@@ -1,0 +1,30 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <defs>
+    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#1e40af"/>
+      <stop offset="100%" stop-color="#3b82f6"/>
+    </linearGradient>
+    <linearGradient id="heartFill" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#ffffff"/>
+      <stop offset="100%" stop-color="#eff6ff"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Rounded square background -->
+  <rect width="512" height="512" rx="96" fill="url(#bg)"/>
+
+  <!-- White heart (care symbol) -->
+  <path d="M 256 375
+    C 130 300  86 240  86 175
+    C  86 125 122  96 165 108
+    C 200 118 230 140 256 162
+    C 282 140 312 118 347 108
+    C 390  96 426 125 426 175
+    C 426 240 382 300 256 375
+    Z"
+    fill="url(#heartFill)"/>
+
+  <!-- Medical cross (blue — appears as care symbol inside the heart) -->
+  <rect x="238" y="148" width="36" height="144" rx="12" fill="#2563eb"/>
+  <rect x="184" y="202" width="144" height="36" rx="12" fill="#2563eb"/>
+</svg>

@@ -140,7 +140,7 @@ function TrackerSection({
           return (
             <div
               key={med.id}
-              className={`flex items-center gap-4 px-4 py-3 print:px-2 print:py-0.5 print:gap-2 ${
+              className={`flex items-start sm:items-center gap-2 sm:gap-4 px-3 sm:px-4 py-3 print:px-2 print:py-0.5 print:gap-2 ${
                 idx < medications.length - 1 ? "border-b border-gray-200" : ""
               }`}
             >
@@ -166,7 +166,7 @@ function TrackerSection({
 
               {/* Instructions */}
               {med.instructions && (
-                <p className="text-sm text-gray-600 italic max-w-48 text-right hidden md:block print:text-xs print:max-w-28">
+                <p className="text-xs text-gray-600 italic sm:text-sm md:max-w-48 md:text-right print:text-xs print:max-w-28">
                   {med.instructions}
                 </p>
               )}

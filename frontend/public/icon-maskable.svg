@@ -1,0 +1,35 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <!--
+    Maskable icon — content sits within the inner 80% "safe zone" circle
+    (radius 204 px centred at 256,256). Background is full-bleed.
+    All coordinates below are the regular icon scaled to ~75 % and re-centred.
+  -->
+  <defs>
+    <linearGradient id="bgm" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#1e40af"/>
+      <stop offset="100%" stop-color="#3b82f6"/>
+    </linearGradient>
+    <linearGradient id="heartFillM" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#ffffff"/>
+      <stop offset="100%" stop-color="#eff6ff"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Full-bleed background (no rounded corners for maskable) -->
+  <rect width="512" height="512" fill="url(#bgm)"/>
+
+  <!-- Heart scaled to 75 %, re-centred at (256, 256) -->
+  <path d="M 256 345
+    C 162 289 128 244 128 195
+    C 128 158 156 136 188 145
+    C 214 153 237 169 256 186
+    C 276 169 298 153 324 145
+    C 357 136 384 158 384 195
+    C 384 244 351 289 256 345
+    Z"
+    fill="url(#heartFillM)"/>
+
+  <!-- Medical cross (75 % scale) -->
+  <rect x="243" y="177" width="27" height="108" rx="9" fill="#2563eb"/>
+  <rect x="204" y="216" width="108" height="27" rx="9" fill="#2563eb"/>
+</svg>

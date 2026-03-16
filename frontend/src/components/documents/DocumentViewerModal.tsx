@@ -69,7 +69,7 @@ export function DocumentViewerModal({
           </span>
         </div>
 
-        <div className="flex" style={{ minHeight: "480px" }}>
+        <div className="flex" style={{ minHeight: "clamp(280px, 60vh, 480px)" }}>
           {/* Sidebar — only when more than 1 page */}
           {pages.length > 1 && (
             <div className="w-16 flex-shrink-0 border-r bg-muted/30 overflow-y-auto flex flex-col gap-1.5 p-1.5">

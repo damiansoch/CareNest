@@ -127,7 +127,7 @@ function RegisterForm({ params }: { params: { locale: string } }) {
           <p className="mt-2 text-muted-foreground">{t("register")}</p>
         </div>
 
-        <div className="rounded-xl border bg-card p-8 shadow-sm">
+        <div className="rounded-xl border bg-card p-6 sm:p-8 shadow-sm">
           {/* Invitation banner */}
           {invitationInfo && (
             <div className="mb-6 rounded-lg bg-primary/10 border border-primary/20 px-4 py-3 text-sm">
@@ -145,7 +145,7 @@ function RegisterForm({ params }: { params: { locale: string } }) {
           )}
 
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-            <div className="grid grid-cols-2 gap-3">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               <div>
                 <label className="block text-sm font-medium mb-1">{t("firstName")}</label>
                 <input

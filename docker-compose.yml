@@ -99,6 +99,9 @@ services:
     restart: unless-stopped
     ports:
       - "3000:3000"
+    volumes:
+      # Mount public/ so static assets (icons, favicons) are live without a rebuild
+      - ./frontend/public:/app/public
     environment:
       NEXT_PUBLIC_API_URL: http://localhost:8000/api/v1
     depends_on:

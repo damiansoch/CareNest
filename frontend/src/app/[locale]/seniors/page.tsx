@@ -41,7 +41,7 @@ function SeniorsContent({ locale }: { locale: string }) {
 
   return (
     <div>
-      <div className="flex items-center justify-between mb-6">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-6">
         <h1 className="text-2xl font-bold">{t("title")}</h1>
         <div className="flex items-center gap-3">
           <button
@@ -77,7 +77,7 @@ function SeniorsContent({ locale }: { locale: string }) {
       )}
 
       {!isLoading && seniors && seniors.length > 0 && (
-        <AnimatedList className="grid gap-4 sm:grid-cols-1 lg:grid-cols-2">
+        <AnimatedList className="grid grid-cols-1 md:grid-cols-2 gap-4">
           {seniors.map((senior) => (
             <AnimatedItem key={senior.id}>
               <SeniorCard

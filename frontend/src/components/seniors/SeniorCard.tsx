@@ -83,7 +83,7 @@ export function SeniorCard({ senior, locale, onArchive }: SeniorCardProps) {
             {!senior.is_archived && (
               <div className="flex-shrink-0 flex items-center gap-1">
                 <Link href={`/${locale}/seniors/${senior.id}/edit`}>
-                  <Button variant="ghost" size="sm" className="h-7 px-2 text-xs">
+                  <Button variant="ghost" size="sm" className="h-9 px-3 text-sm md:h-7 md:px-2 md:text-xs">
                     {tCommon("edit")}
                   </Button>
                 </Link>
@@ -91,7 +91,7 @@ export function SeniorCard({ senior, locale, onArchive }: SeniorCardProps) {
                   <Button
                     variant="ghost"
                     size="sm"
-                    className="h-7 px-2 text-xs text-muted-foreground hover:text-destructive"
+                    className="h-9 px-3 text-sm md:h-7 md:px-2 md:text-xs text-muted-foreground hover:text-destructive"
                     onClick={() => onArchive(senior.id)}
                   >
                     {tCommon("archive")}
@@ -106,21 +106,21 @@ export function SeniorCard({ senior, locale, onArchive }: SeniorCardProps) {
             <div className="border-t flex divide-x">
               <Link
                 href={`${base}/medications`}
-                className="flex-1 flex items-center justify-center gap-1.5 py-2.5 text-xs text-muted-foreground hover:text-primary hover:bg-accent transition-colors"
+                className="flex-1 flex items-center justify-center gap-1.5 py-3 text-xs text-muted-foreground hover:text-primary hover:bg-accent transition-colors"
               >
                 <Pill size={13} />
                 {tMeds("title")}
               </Link>
               <Link
                 href={`${base}/appointments`}
-                className="flex-1 flex items-center justify-center gap-1.5 py-2.5 text-xs text-muted-foreground hover:text-primary hover:bg-accent transition-colors"
+                className="flex-1 flex items-center justify-center gap-1.5 py-3 text-xs text-muted-foreground hover:text-primary hover:bg-accent transition-colors"
               >
                 <Calendar size={13} />
                 {tAppts("title")}
               </Link>
               <Link
                 href={`/${locale}/tracker/${senior.id}`}
-                className="flex-1 flex items-center justify-center gap-1.5 py-2.5 text-xs text-muted-foreground hover:text-primary hover:bg-accent transition-colors"
+                className="flex-1 flex items-center justify-center gap-1.5 py-3 text-xs text-muted-foreground hover:text-primary hover:bg-accent transition-colors"
               >
                 <Printer size={13} />
                 {tTracker("printTracker")}

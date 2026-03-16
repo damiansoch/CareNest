@@ -53,7 +53,7 @@ export default function LoginPage({
           <p className="mt-2 text-muted-foreground">{t("login")}</p>
         </div>
 
-        <div className="rounded-xl border bg-card p-8 shadow-sm">
+        <div className="rounded-xl border bg-card p-6 sm:p-8 shadow-sm">
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
             <div>
               <label className="block text-sm font-medium mb-1">{t("email")}</label>

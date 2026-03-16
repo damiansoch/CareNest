@@ -6,7 +6,16 @@
       "Bash(dir \"D:\\\\PyCharmProjects\\\\CareNest\\\\backend\\\\apps\\\\notifications\")",
       "Bash(dir \"D:\\\\PyCharmProjects\\\\CareNest\\\\backend\\\\apps\\\\documents\")",
       "Bash(dir \"D:\\\\PyCharmProjects\\\\CareNest\\\\frontend\\\\src\\\\components\\\\documents\")",
-      "Bash(del \"D:\\\\PyCharmProjects\\\\CareNest\\\\backend\\\\apps\\\\documents\\\\migrations\\\\0001_initial.py\")"
+      "Bash(del \"D:\\\\PyCharmProjects\\\\CareNest\\\\backend\\\\apps\\\\documents\\\\migrations\\\\0001_initial.py\")",
+      "Bash(grep -r \"icon\\\\|favicon\\\\|apple-touch\" /d/PyCharmProjects/CareNest/frontend/src/app/[locale]/layout.tsx)",
+      "Bash(npm install -D @resvg/resvg-js png-to-ico)",
+      "Bash(cmd //c \"cd D:\\\\PyCharmProjects\\\\CareNest\\\\frontend && npm install -D @resvg/resvg-js png-to-ico 2>&1\")",
+      "Bash(cmd //c \"cd D:\\\\PyCharmProjects\\\\CareNest\\\\frontend && node scripts/generate-icons.mjs 2>&1\")",
+      "Bash(cmd //c \"dir D:\\\\PyCharmProjects\\\\CareNest\\\\frontend\\\\public\\\\ /b\")",
+      "Bash(cmd //c \"cd D:\\\\PyCharmProjects\\\\CareNest\\\\frontend && npx tsc --noEmit 2>&1\")",
+      "Bash(cmd //c \"docker compose up -d frontend 2>&1\")",
+      "Bash(cmd //c \"curl -s -o /dev/null -w \"\"%{http_code}\"\" http://localhost:3000/icon.svg && echo \"\"\"\" && curl -s -o /dev/null -w \"\"%{http_code}\"\" http://localhost:3000/icon-192.png && echo \"\"\"\" && curl -s -o /dev/null -w \"\"%{http_code}\"\" http://localhost:3000/favicon.ico\")",
+      "Bash(cmd //c \"curl -s -o nul -w \"\"icon.svg: %{http_code}\\\\n\"\" http://localhost:3000/icon.svg && curl -s -o nul -w \"\"icon-192.png: %{http_code}\\\\n\"\" http://localhost:3000/icon-192.png && curl -s -o nul -w \"\"favicon.ico: %{http_code}\\\\n\"\" http://localhost:3000/favicon.ico && curl -s -o nul -w \"\"favicon-32x32.png: %{http_code}\\\\n\"\" http://localhost:3000/favicon-32x32.png && curl -s -o nul -w \"\"apple-touch-icon.png: %{http_code}\\\\n\"\" http://localhost:3000/apple-touch-icon.png\")"
     ]
   }
 }

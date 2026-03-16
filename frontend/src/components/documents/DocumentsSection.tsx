@@ -100,9 +100,9 @@ export function DocumentsSection({ seniorId, locale }: DocumentsSectionProps) {
       </div>
 
       {/* Filters row */}
-      <div className="flex flex-wrap items-center gap-2 mb-3">
+      <div className="flex flex-col sm:flex-row sm:flex-wrap sm:items-center gap-2 mb-3">
         <Select value={category} onValueChange={setCategory}>
-          <SelectTrigger className="w-[180px] h-8 text-xs">
+          <SelectTrigger className="w-full sm:w-[180px] h-8 text-xs">
             <SelectValue />
           </SelectTrigger>
           <SelectContent>
@@ -115,7 +115,7 @@ export function DocumentsSection({ seniorId, locale }: DocumentsSectionProps) {
         </Select>
 
         <Select value={ordering} onValueChange={setOrdering}>
-          <SelectTrigger className="w-[150px] h-8 text-xs">
+          <SelectTrigger className="w-full sm:w-[150px] h-8 text-xs">
             <SelectValue />
           </SelectTrigger>
           <SelectContent>

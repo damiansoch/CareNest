@@ -121,7 +121,7 @@ export function DocumentCard({ seniorId, document: doc, locale, onTagClick, acti
                 <Button
                   variant="ghost"
                   size="icon"
-                  className="h-7 w-7"
+                  className="h-9 w-9 md:h-7 md:w-7"
                   onClick={() => setViewerOpen(true)}
                   aria-label={t("viewDocument")}
                 >
@@ -130,7 +130,7 @@ export function DocumentCard({ seniorId, document: doc, locale, onTagClick, acti
                 <Button
                   variant="ghost"
                   size="icon"
-                  className="h-7 w-7 text-muted-foreground hover:text-foreground"
+                  className="h-9 w-9 md:h-7 md:w-7 text-muted-foreground hover:text-foreground"
                   onClick={() => setEditOpen(true)}
                   aria-label="Edytuj dokument"
                 >
@@ -140,7 +140,7 @@ export function DocumentCard({ seniorId, document: doc, locale, onTagClick, acti
                   variant="ghost"
                   size="icon"
                   className={cn(
-                    "h-7 w-7 transition-colors",
+                    "h-9 w-9 md:h-7 md:w-7 transition-colors",
                     confirmDelete
                       ? "text-destructive bg-destructive/10 hover:bg-destructive hover:text-destructive-foreground"
                       : "text-muted-foreground hover:text-destructive"

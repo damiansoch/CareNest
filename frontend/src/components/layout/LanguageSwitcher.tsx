@@ -26,7 +26,7 @@ export function LanguageSwitcher({ locale }: { locale: string }) {
           key={code}
           onClick={() => switchLocale(code)}
           className={cn(
-            "rounded px-2 py-1 text-xs font-medium transition-colors",
+            "rounded px-3 py-1.5 text-xs font-medium transition-colors",
             locale === code
               ? "bg-primary text-primary-foreground"
               : "text-muted-foreground hover:bg-accent hover:text-accent-foreground"

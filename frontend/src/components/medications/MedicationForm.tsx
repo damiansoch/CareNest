@@ -84,7 +84,7 @@ export function MedicationForm({ defaultValues, onSubmit, onCancel }: Medication
   return (
     <form onSubmit={handleSubmit(handleFormSubmit)} className="space-y-5">
       {/* Name + dosage */}
-      <div className="grid grid-cols-2 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         <div>
           <Label htmlFor="name">{t("name")} *</Label>
           <Input id="name" {...register("name")} error={!!errors.name} className="mt-1" />
@@ -126,7 +126,7 @@ export function MedicationForm({ defaultValues, onSubmit, onCancel }: Medication
       </div>
 
       {/* Dates */}
-      <div className="grid grid-cols-2 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         <div>
           <Label htmlFor="start_date">{t("startDate")} *</Label>
           <Input
@@ -186,7 +186,7 @@ export function MedicationForm({ defaultValues, onSubmit, onCancel }: Medication
                 <Input
                   type="time"
                   {...register(`schedules.${idx}.custom_time`)}
-                  className="w-32"
+                  className="w-24 sm:w-32"
                 />
               )}
               <Button
