@@ -8,6 +8,7 @@ from rest_framework.views import APIView
 
 from apps.accounts.permissions import IsFamilyMember
 from apps.seniors.models import Senior
+from .encryption import decrypt_bytes, encrypt_bytes
 from .models import Document, DocumentPage
 from .serializers import DocumentDetailSerializer, DocumentListSerializer
 
@@ -97,7 +98,7 @@ class DocumentListCreateView(generics.ListAPIView):
                     {"pages": [f'File "{f.name}" is not a supported format. Use JPEG, PNG, or PDF.']},
                     status=400,
                 )
-            validated_pages.append((raw, mime, len(raw)))
+            validated_pages.append((raw, mime, len(raw)))  # file_size = original unencrypted size
 
         # ── Validate metadata ───────────────────────────────────────────────
         name = request.data.get("name", "").strip()
@@ -131,8 +132,9 @@ class DocumentListCreateView(generics.ListAPIView):
                 document=doc,
                 page_number=idx,
                 mime_type=mime,
-                file_size=size,
-                content=raw,
+                file_size=size,          # original unencrypted size for Content-Length
+                content=encrypt_bytes(raw),
+                is_encrypted=True,
             )
 
         # ── Send notification ───────────────────────────────────────────────
@@ -223,7 +225,9 @@ class DocumentPageContentView(APIView):
         }
         ext = ext_map.get(page.mime_type, "bin")
 
-        response = HttpResponse(bytes(page.content), content_type=page.mime_type)
+        raw = bytes(page.content)
+        content = decrypt_bytes(raw) if page.is_encrypted else raw
+        response = HttpResponse(content, content_type=page.mime_type)
         response["Content-Length"] = page.file_size
         response["Content-Disposition"] = f'inline; filename="page-{page.page_number}.{ext}"'
         response["Cache-Control"] = "private, max-age=3600"

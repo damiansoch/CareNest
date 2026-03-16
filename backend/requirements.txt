@@ -19,6 +19,7 @@ django-anymail==11.1  # optional: for SendGrid/Mailgun; can use SMTP
 
 # Security
 django[argon2]==5.0.6
+cryptography>=42.0.0   # document encryption at rest
 
 # Utilities
 python-decouple==3.8

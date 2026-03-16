@@ -79,8 +79,12 @@ class DocumentPage(models.Model):
     mime_type = models.CharField(max_length=30)
     file_size = models.PositiveIntegerField(help_text=_("Size in bytes"))
     # Binary content — never exposed through serializers, only streamed via the
-    # dedicated content endpoint.
+    # dedicated content endpoint.  Stored encrypted when is_encrypted=True.
     content = models.BinaryField(editable=False)
+    is_encrypted = models.BooleanField(
+        default=False,
+        help_text=_("True when content is encrypted with the Fernet key derived from SECRET_KEY"),
+    )
     created_at = models.DateTimeField(auto_now_add=True)
 
     class Meta:
