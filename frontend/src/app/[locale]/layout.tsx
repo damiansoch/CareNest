@@ -57,7 +57,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
       description:     copy.description,
       images: [
         {
-          url:    "/og-image.png",
+          url:    `/api/og?locale=${locale}`,
           width:  1200,
           height: 630,
           alt:    `${SITE_NAME} — ${copy.tagline}`,
@@ -71,7 +71,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
       card:        "summary_large_image",
       title:       `${SITE_NAME} — ${copy.tagline}`,
       description: copy.description,
-      images:      ["/og-image.png"],
+      images:      [`/api/og?locale=${locale}`],
     },
 
     // Canonical + hreflang
@@ -122,7 +122,7 @@ function JsonLd({ locale }: { locale: string }) {
       locale === "pl"
         ? ["Zarządzanie lekami", "Wizyty lekarskie", "Powiadomienia email", "Drukowanie trackerów leków", "Wieloosobowy dostęp"]
         : ["Medication management", "Medical appointments", "Email reminders", "Printable medication trackers", "Multi-user access"],
-    screenshot: `${SITE_URL}/og-image.png`,
+    screenshot: `${SITE_URL}/api/og?locale=${locale}`,
     provider: {
       "@type": "Organization",
       name:    SITE_NAME,
