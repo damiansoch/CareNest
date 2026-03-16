@@ -42,6 +42,17 @@
     "noAccount": "Nie masz konta?",
     "hasAccount": "Masz już konto?",
     "forgotPassword": "Zapomniałeś hasła?",
+    "forgotPasswordTitle": "Zresetuj hasło",
+    "forgotPasswordDesc": "Podaj adres e-mail, a wyślemy Ci link do resetowania hasła.",
+    "forgotPasswordButton": "Wyślij link resetujący",
+    "forgotPasswordSent": "Jeśli konto z tym adresem istnieje, wysłaliśmy link do resetowania hasła.",
+    "resetPasswordTitle": "Ustaw nowe hasło",
+    "resetPasswordDesc": "Wpisz nowe hasło dla swojego konta.",
+    "newPassword": "Nowe hasło",
+    "resetPasswordButton": "Ustaw nowe hasło",
+    "resetPasswordSuccess": "Hasło zostało zresetowane. Możesz się teraz zalogować.",
+    "resetLinkInvalid": "Ten link do resetowania jest nieprawidłowy lub wygasł.",
+    "backToLogin": "Wróć do logowania",
     "createFamily": "Utwórz nową rodzinę",
     "joinFamily": "Dołącz do rodziny przez zaproszenie"
   },
@@ -128,6 +139,8 @@
   },
   "team": {
     "title": "Zespół opiekunów",
+    "members": "Opiekunowie",
+    "you": "Ty",
     "inviteMember": "Zaproś opiekuna",
     "inviteEmail": "Adres e-mail",
     "inviteRole": "Rola",
@@ -135,6 +148,11 @@
     "roleMember": "Opiekun",
     "inviteSent": "Zaproszenie zostało wysłane.",
     "pendingInvitations": "Oczekujące zaproszenia",
+    "expiresOn": "Wygasa",
+    "pending": "Oczekujące",
+    "removeMember": "Usuń",
+    "removeConfirm": "Czy na pewno chcesz usunąć tego opiekuna z rodziny?",
+    "removedSuccess": "Opiekun został usunięty.",
     "noMembers": "Brak członków zespołu."
   },
   "documents": {

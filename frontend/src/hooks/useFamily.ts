@@ -43,3 +43,14 @@ export function useInvite() {
     onError: () => toast({ title: "Błąd", description: "Nie udało się wysłać zaproszenia.", variant: "destructive" }),
   });
 }
+
+export function useRemoveMember() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: (membershipId: string) => familyApi.removeMember(membershipId),
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ["family-members"] });
+    },
+    onError: () => toast({ title: "Błąd", description: "Nie udało się usunąć opiekuna.", variant: "destructive" }),
+  });
+}

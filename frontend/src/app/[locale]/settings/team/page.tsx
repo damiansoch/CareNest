@@ -1,11 +1,10 @@
 "use client";
 
-import { useState } from "react";
 import { useTranslations } from "next-intl";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
-import { UserPlus, Shield, User, Mail, Clock } from "lucide-react";
+import { UserPlus, Shield, User, Mail, Clock, X } from "lucide-react";
 import { AppShell } from "@/components/layout/AppShell";
 import { AuthGuard } from "@/components/layout/AuthGuard";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -16,11 +15,12 @@ import { Badge } from "@/components/ui/badge";
 import { Select, SelectTrigger, SelectContent, SelectItem, SelectValue } from "@/components/ui/select";
 import { FieldError, FormError } from "@/components/ui/error-message";
 import { Spinner } from "@/components/ui/spinner";
-import { useMembers, useInvitations, useInvite } from "@/hooks/useFamily";
+import { useMembers, useInvitations, useInvite, useRemoveMember } from "@/hooks/useFamily";
 import { useAuthStore } from "@/store/auth";
 import { format } from "date-fns";
 import { pl, enUS } from "date-fns/locale";
 import { Controller } from "react-hook-form";
+import { toast } from "@/store/toast";
 
 const inviteSchema = z.object({
   email: z.string().email(),
@@ -49,7 +49,10 @@ function TeamContent({ locale }: { locale: string }) {
   const { data: members, isLoading: membersLoading } = useMembers();
   const { data: invitations } = useInvitations();
   const invite = useInvite();
+  const removeMember = useRemoveMember();
   const dateLocale = locale === "pl" ? pl : enUS;
+
+  const isAdmin = members?.find((m) => m.user.id === currentUser?.id)?.role === "admin";
 
   const {
     register,
@@ -68,7 +71,15 @@ function TeamContent({ locale }: { locale: string }) {
       await invite.mutateAsync(data);
       reset();
     } catch {
-      setError("root", { message: "Nie udało się wysłać zaproszenia." });
+      setError("root", { message: t("inviteSent") });
+    }
+  }
+
+  function handleRemove(membershipId: string) {
+    if (confirm(t("removeConfirm"))) {
+      removeMember.mutate(membershipId, {
+        onSuccess: () => toast({ title: t("removedSuccess") }),
+      });
     }
   }
 
@@ -81,7 +92,7 @@ function TeamContent({ locale }: { locale: string }) {
       {/* Current members */}
       <section className="mb-8">
         <h2 className="text-sm font-semibold text-muted-foreground uppercase tracking-wide mb-3">
-          Opiekunowie
+          {t("members")}
         </h2>
         <div className="rounded-xl border divide-y">
           {membersLoading && (
@@ -96,7 +107,7 @@ function TeamContent({ locale }: { locale: string }) {
                 <p className="text-sm font-medium">
                   {m.user.first_name} {m.user.last_name}
                   {m.user.id === currentUser?.id && (
-                    <span className="ml-1.5 text-xs text-muted-foreground">(Ty)</span>
+                    <span className="ml-1.5 text-xs text-muted-foreground">({t("you")})</span>
                   )}
                 </p>
                 <p className="text-xs text-muted-foreground">{m.user.email}</p>
@@ -108,6 +119,17 @@ function TeamContent({ locale }: { locale: string }) {
                   <><User size={10} className="mr-1" />{t("roleMember")}</>
                 )}
               </Badge>
+              {isAdmin && m.user.id !== currentUser?.id && (
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="h-8 w-8 text-muted-foreground hover:text-destructive"
+                  onClick={() => handleRemove(m.id)}
+                  title={t("removeMember")}
+                >
+                  <X size={14} />
+                </Button>
+              )}
             </div>
           ))}
           {!membersLoading && (!members || members.length === 0) && (
@@ -132,70 +154,72 @@ function TeamContent({ locale }: { locale: string }) {
                   <p className="text-sm font-medium">{inv.email}</p>
                   <div className="flex items-center gap-1 text-xs text-muted-foreground">
                     <Clock size={10} />
-                    Wygasa: {format(new Date(inv.expires_at), "d MMM yyyy", { locale: dateLocale })}
+                    {t("expiresOn")}: {format(new Date(inv.expires_at), "d MMM yyyy", { locale: dateLocale })}
                   </div>
                 </div>
-                <Badge variant="warning">Oczekujące</Badge>
+                <Badge variant="warning">{t("pending")}</Badge>
               </div>
             ))}
           </div>
         </section>
       )}
 
-      {/* Invite form */}
-      <section>
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <UserPlus size={18} />
-              {t("inviteMember")}
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-              <div>
-                <Label htmlFor="invite-email">{t("inviteEmail")}</Label>
-                <Input
-                  id="invite-email"
-                  type="email"
-                  {...register("email")}
-                  error={!!errors.email}
-                  className="mt-1"
-                  placeholder="jan@example.com"
-                />
-                <FieldError message={errors.email?.message} />
-              </div>
-
-              <div>
-                <Label>{t("inviteRole")}</Label>
-                <Controller
-                  control={control}
-                  name="role"
-                  render={({ field }) => (
-                    <Select value={field.value} onValueChange={field.onChange}>
-                      <SelectTrigger className="mt-1">
-                        <SelectValue />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="member">{t("roleMember")}</SelectItem>
-                        <SelectItem value="admin">{t("roleAdmin")}</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  )}
-                />
-              </div>
-
-              <FormError message={errors.root?.message} />
-
-              <Button type="submit" disabled={isSubmitting}>
-                {isSubmitting && <Spinner className="h-4 w-4" />}
-                <UserPlus size={16} />
+      {/* Invite form — admins only */}
+      {isAdmin && (
+        <section>
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <UserPlus size={18} />
                 {t("inviteMember")}
-              </Button>
-            </form>
-          </CardContent>
-        </Card>
-      </section>
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+                <div>
+                  <Label htmlFor="invite-email">{t("inviteEmail")}</Label>
+                  <Input
+                    id="invite-email"
+                    type="email"
+                    {...register("email")}
+                    error={!!errors.email}
+                    className="mt-1"
+                    placeholder="jan@example.com"
+                  />
+                  <FieldError message={errors.email?.message} />
+                </div>
+
+                <div>
+                  <Label>{t("inviteRole")}</Label>
+                  <Controller
+                    control={control}
+                    name="role"
+                    render={({ field }) => (
+                      <Select value={field.value} onValueChange={field.onChange}>
+                        <SelectTrigger className="mt-1">
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="member">{t("roleMember")}</SelectItem>
+                          <SelectItem value="admin">{t("roleAdmin")}</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    )}
+                  />
+                </div>
+
+                <FormError message={errors.root?.message} />
+
+                <Button type="submit" disabled={isSubmitting}>
+                  {isSubmitting && <Spinner className="h-4 w-4" />}
+                  <UserPlus size={16} />
+                  {t("inviteMember")}
+                </Button>
+              </form>
+            </CardContent>
+          </Card>
+        </section>
+      )}
     </div>
   );
 }

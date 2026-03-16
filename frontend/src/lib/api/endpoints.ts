@@ -39,6 +39,16 @@ export const authApi = {
     apiClient.get<{ email: string; family_name: string; role: string }>(
       `/auth/invitations/${token}/`
     ),
+
+  requestPasswordReset: (email: string) =>
+    apiClient.post<{ detail: string }>("/auth/password-reset/", { email }),
+
+  confirmPasswordReset: (uid: string, token: string, password: string) =>
+    apiClient.post<{ detail: string }>("/auth/password-reset/confirm/", {
+      uid,
+      token,
+      password,
+    }),
 };
 
 // ─── Family ───────────────────────────────────────────────────────────────────
@@ -50,6 +60,8 @@ export const familyApi = {
   invitations: () => apiClient.get<PaginatedResponse<Invitation>>("/family/invitations/"),
   invite: (data: { email: string; role: string }) =>
     apiClient.post<Invitation>("/family/invitations/", data),
+  removeMember: (membershipId: string) =>
+    apiClient.delete(`/family/members/${membershipId}/`),
 };
 
 // ─── Seniors ─────────────────────────────────────────────────────────────────

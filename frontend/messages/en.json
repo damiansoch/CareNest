@@ -42,6 +42,17 @@
     "noAccount": "Don't have an account?",
     "hasAccount": "Already have an account?",
     "forgotPassword": "Forgot password?",
+    "forgotPasswordTitle": "Reset your password",
+    "forgotPasswordDesc": "Enter your email address and we'll send you a reset link.",
+    "forgotPasswordButton": "Send reset link",
+    "forgotPasswordSent": "If an account with that email exists, a reset link has been sent.",
+    "resetPasswordTitle": "Set new password",
+    "resetPasswordDesc": "Enter a new password for your account.",
+    "newPassword": "New password",
+    "resetPasswordButton": "Set new password",
+    "resetPasswordSuccess": "Your password has been reset. You can now log in.",
+    "resetLinkInvalid": "This reset link is invalid or has expired.",
+    "backToLogin": "Back to login",
     "createFamily": "Create a new family",
     "joinFamily": "Join a family via invitation"
   },
@@ -128,6 +139,8 @@
   },
   "team": {
     "title": "Caregiver Team",
+    "members": "Members",
+    "you": "You",
     "inviteMember": "Invite caregiver",
     "inviteEmail": "Email address",
     "inviteRole": "Role",
@@ -135,6 +148,11 @@
     "roleMember": "Caregiver",
     "inviteSent": "Invitation sent.",
     "pendingInvitations": "Pending invitations",
+    "expiresOn": "Expires",
+    "pending": "Pending",
+    "removeMember": "Remove",
+    "removeConfirm": "Are you sure you want to remove this caregiver from the family?",
+    "removedSuccess": "Caregiver removed.",
     "noMembers": "No team members."
   },
   "documents": {
