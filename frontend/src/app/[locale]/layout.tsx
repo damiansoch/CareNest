@@ -44,12 +44,6 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     generator: "Next.js",
     referrer: "origin-when-cross-origin",
 
-    robots: {
-      index: false,
-      follow: false,
-      googleBot: { index: false, follow: false, noimageindex: true },
-    },
-
     openGraph: {
       type: "website",
       locale: ogLocale(locale),
