@@ -26,19 +26,38 @@ class RegisterSerializer(serializers.Serializer):
     invitation_token = serializers.UUIDField(required=False)
 
     def validate_email(self, value):
-        if User.objects.filter(email=value).exists():
-            raise serializers.ValidationError(_("A user with this email already exists."))
+        # Full uniqueness check is deferred to validate() where we have the
+        # full context (invitation token) to allow re-joining after removal.
         return value.lower()
 
     def validate(self, data):
-        if not data.get("family_name") and not data.get("invitation_token"):
+        email = data.get("email", "")
+        invitation_token = data.get("invitation_token")
+
+        existing_user = User.objects.filter(email=email).first()
+
+        if existing_user:
+            if not invitation_token:
+                # No invitation — this is a new-family registration, block duplicates.
+                raise serializers.ValidationError(
+                    {"email": _("A user with this email already exists.")}
+                )
+            if hasattr(existing_user, "membership"):
+                # Already a member of some family.
+                raise serializers.ValidationError(
+                    {"email": _("This user is already a member of a family.")}
+                )
+            # Existing user with no membership + valid invitation → re-join allowed.
+            data["_existing_user"] = existing_user
+
+        if not data.get("family_name") and not invitation_token:
             raise serializers.ValidationError(
                 _("Provide either a family name (new family) or an invitation token.")
             )
-        if data.get("invitation_token"):
+        if invitation_token:
             try:
                 invitation = Invitation.objects.get(
-                    token=data["invitation_token"],
+                    token=invitation_token,
                     status=Invitation.Status.PENDING,
                 )
             except Invitation.DoesNotExist:
@@ -49,16 +68,22 @@ class RegisterSerializer(serializers.Serializer):
         return data
 
     def create(self, validated_data):
+        existing_user = validated_data.pop("_existing_user", None)
         invitation = validated_data.pop("_invitation", None)
         family_name = validated_data.pop("family_name", None)
 
-        user = User.objects.create_user(
-            username=validated_data["email"],
-            email=validated_data["email"],
-            password=validated_data["password"],
-            first_name=validated_data["first_name"],
-            last_name=validated_data["last_name"],
-        )
+        if existing_user:
+            # Re-join: reuse the existing account, do not create a new one or
+            # change their password.
+            user = existing_user
+        else:
+            user = User.objects.create_user(
+                username=validated_data["email"],
+                email=validated_data["email"],
+                password=validated_data["password"],
+                first_name=validated_data["first_name"],
+                last_name=validated_data["last_name"],
+            )
 
         if invitation:
             family = invitation.family
