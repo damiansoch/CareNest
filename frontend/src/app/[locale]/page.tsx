@@ -2,10 +2,9 @@
 
 import { useTranslations } from "next-intl";
 import Link from "next/link";
-import { isFuture, isToday, format, type Locale } from "date-fns";
+import { isFuture, isToday, format, parseISO, type Locale } from "date-fns";
 import { pl, enUS } from "date-fns/locale";
 import { Plus, Users, Calendar, Printer } from "lucide-react";
-import { useQueries } from "@tanstack/react-query";
 import { motion } from "framer-motion";
 import { AppShell } from "@/components/layout/AppShell";
 import { AuthGuard } from "@/components/layout/AuthGuard";
@@ -16,7 +15,7 @@ import { AnimatedList, AnimatedItem } from "@/components/ui/animated-list";
 import { useSeniors } from "@/hooks/useSeniors";
 import { useFamily } from "@/hooks/useFamily";
 import { useAuthStore } from "@/store/auth";
-import { appointmentsApi } from "@/lib/api/endpoints";
+import { useAllAppointments } from "@/hooks/useAppointments";
 import type { Appointment } from "@/types";
 
 export default function DashboardPage({
@@ -39,29 +38,14 @@ function DashboardContent({ locale }: { locale: string }) {
   const { user } = useAuthStore();
   const { data: family } = useFamily();
   const { data: seniors } = useSeniors();
+  const { data: allAppointments } = useAllAppointments();
   const dateLocale = locale === "pl" ? pl : enUS;
 
-  const appointmentQueries = useQueries({
-    queries: (seniors ?? []).map((senior) => ({
-      queryKey: ["appointments", senior.id],
-      queryFn: async () => {
-        const res = await appointmentsApi.list(senior.id);
-        return res.data.results.map((a) => ({
-          ...a,
-          seniorName: senior.full_name,
-          seniorId: senior.id,
-        }));
-      },
-      enabled: !!senior.id,
-    })),
-  });
+  const allUpcoming = (allAppointments ?? [])
+    .filter((a) => isFuture(parseISO(a.datetime.slice(0, 16))))
+    .sort((a, b) => a.datetime.localeCompare(b.datetime));
 
-  const allUpcoming = appointmentQueries
-    .flatMap((q) => (q.data as (Appointment & { seniorName: string; seniorId: string })[]) ?? [])
-    .filter((a) => isFuture(new Date(a.datetime)))
-    .sort((a, b) => new Date(a.datetime).getTime() - new Date(b.datetime).getTime());
-
-  const todayAppts = allUpcoming.filter((a) => isToday(new Date(a.datetime)));
+  const todayAppts = allUpcoming.filter((a) => isToday(parseISO(a.datetime.slice(0, 16))));
   const upcomingAppts = allUpcoming.slice(0, 5);
 
   return (
@@ -210,13 +194,13 @@ function ApptRow({
   locale,
   dateLocale,
 }: {
-  appt: Appointment & { seniorName: string; seniorId: string };
+  appt: Appointment & { senior_id: string; senior_name: string };
   locale: string;
   dateLocale: Locale;
 }) {
-  const apptDate = new Date(appt.datetime);
+  const apptDate = parseISO(appt.datetime.slice(0, 16));
   return (
-    <Link href={`/${locale}/seniors/${appt.seniorId}/appointments`}>
+    <Link href={`/${locale}/seniors/${appt.senior_id}/appointments`}>
       <motion.div
         className="flex items-center gap-3 rounded-lg border px-4 py-3 hover:bg-accent/50 transition-colors"
         whileHover={{ x: 4 }}
@@ -233,7 +217,7 @@ function ApptRow({
         <div className="flex-1 min-w-0">
           <p className="text-sm font-medium truncate">{appt.title}</p>
           <p className="text-xs text-muted-foreground">
-            {appt.seniorName}
+            {appt.senior_name}
             {appt.doctor_name ? ` • ${appt.doctor_name}` : ""}
             {" • "}
             {format(apptDate, "HH:mm")}

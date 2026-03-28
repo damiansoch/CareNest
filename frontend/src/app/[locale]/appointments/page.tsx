@@ -3,7 +3,7 @@
 import { useTranslations } from "next-intl";
 import Link from "next/link";
 import { Calendar, ShoppingCart, CalendarDays } from "lucide-react";
-import { isFuture, isPast, format, type Locale } from "date-fns";
+import { isFuture, isPast, format, parseISO, type Locale } from "date-fns";
 import { pl, enUS } from "date-fns/locale";
 import { Clock, MapPin, User, Bell, Link as LinkIcon } from "lucide-react";
 import { AppShell } from "@/components/layout/AppShell";
@@ -37,8 +37,8 @@ function AllAppointmentsContent({ locale }: { locale: string }) {
   const { data: appointments, isLoading } = useAllAppointments();
   const dateLocale = locale === "pl" ? pl : enUS;
 
-  const upcoming = appointments?.filter((a) => isFuture(new Date(a.datetime))) ?? [];
-  const past = appointments?.filter((a) => isPast(new Date(a.datetime))) ?? [];
+  const upcoming = appointments?.filter((a) => isFuture(parseISO(a.datetime.slice(0, 16)))) ?? [];
+  const past = appointments?.filter((a) => isPast(parseISO(a.datetime.slice(0, 16)))) ?? [];
 
   return (
     <div>
@@ -102,7 +102,7 @@ function AppointmentRow({
   dateLocale: Locale;
 }) {
   const t = useTranslations("appointments");
-  const apptDate = new Date(appointment.datetime);
+  const apptDate = parseISO(appointment.datetime.slice(0, 16));
   const isUpcoming = isFuture(apptDate);
   const hasReminders = appointment.reminder_configs.some((r) => r.is_enabled);
 

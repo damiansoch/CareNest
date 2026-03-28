@@ -4,7 +4,7 @@ import { useState } from "react";
 import { useTranslations } from "next-intl";
 import Link from "next/link";
 import { ArrowLeft, Plus, Calendar } from "lucide-react";
-import { isFuture, isPast } from "date-fns";
+import { isFuture, isPast, parseISO } from "date-fns";
 import { AppShell } from "@/components/layout/AppShell";
 import { AuthGuard } from "@/components/layout/AuthGuard";
 import { AppointmentCard } from "@/components/appointments/AppointmentCard";
@@ -63,8 +63,8 @@ function AppointmentsContent({ locale, seniorId }: { locale: string; seniorId: s
 
   const update = useUpdateAppointment(seniorId, editingAppt?.id ?? "");
 
-  const upcoming = appointments?.filter((a) => isFuture(new Date(a.datetime))) ?? [];
-  const past = appointments?.filter((a) => isPast(new Date(a.datetime))) ?? [];
+  const upcoming = appointments?.filter((a) => isFuture(parseISO(a.datetime.slice(0, 16)))) ?? [];
+  const past = appointments?.filter((a) => isPast(parseISO(a.datetime.slice(0, 16)))) ?? [];
 
   function handleDelete(id: string) {
     if (confirm(t("deleteConfirm"))) {
