@@ -46,9 +46,8 @@ export function AppointmentForm({ defaultValues, onSubmit, onCancel }: Appointme
     (r) => r.offset_hours === 168 && r.is_enabled
   );
 
-  // Convert stored UTC datetime to local datetime-local input format
   const defaultDatetime = defaultValues?.datetime
-    ? new Date(defaultValues.datetime).toISOString().slice(0, 16)
+    ? defaultValues.datetime.slice(0, 16)
     : "";
 
   const {
@@ -123,6 +122,7 @@ export function AppointmentForm({ defaultValues, onSubmit, onCancel }: Appointme
             className="mt-1"
           />
           <FieldError message={errors.datetime?.message} />
+          <p className="mt-1 text-xs text-muted-foreground">{t("datetimeHint")}</p>
         </div>
       </div>
 

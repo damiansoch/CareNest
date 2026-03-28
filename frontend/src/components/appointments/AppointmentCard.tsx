@@ -1,7 +1,7 @@
 "use client";
 
 import { useTranslations } from "next-intl";
-import { format, isPast, isFuture } from "date-fns";
+import { format, isPast, isFuture, parseISO } from "date-fns";
 import { pl, enUS } from "date-fns/locale";
 import { MapPin, User, Clock, Bell, Pencil, Trash2, Link, ShoppingCart, CalendarDays } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
@@ -27,7 +27,7 @@ export function AppointmentCard({ appointment, locale, onEdit, onDelete }: Appoi
   const tCommon = useTranslations("common");
   const dateLocale = locale === "pl" ? pl : enUS;
 
-  const apptDate = new Date(appointment.datetime);
+  const apptDate = parseISO(appointment.datetime.slice(0, 16));
   const isUpcoming = isFuture(apptDate);
   const hasReminders = appointment.reminder_configs.some((r) => r.is_enabled);
   const TypeIcon = EVENT_TYPE_ICONS[appointment.event_type] ?? CalendarDays;
@@ -74,6 +74,9 @@ export function AppointmentCard({ appointment, locale, onEdit, onDelete }: Appoi
                 {format(apptDate, "HH:mm", { locale: dateLocale })}
                 {" — "}
                 {format(apptDate, "d MMMM yyyy", { locale: dateLocale })}
+                <span className="text-[10px] text-muted-foreground/60 ml-0.5">
+                  ({t("localTime")})
+                </span>
               </div>
               {appointment.doctor_name && (
                 <div className="flex items-center gap-1.5 text-xs text-muted-foreground">

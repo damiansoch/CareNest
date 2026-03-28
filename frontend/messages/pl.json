@@ -127,7 +127,9 @@
     "noAppointments": "Brak zdarzeń. Dodaj pierwsze zdarzenie.",
     "upcoming": "Nadchodzące",
     "past": "Poprzednie",
-    "deleteConfirm": "Czy na pewno chcesz usunąć to zdarzenie?"
+    "deleteConfirm": "Czy na pewno chcesz usunąć to zdarzenie?",
+    "datetimeHint": "Godzina podana w czasie lokalnym podopiecznego.",
+    "localTime": "czas lokalny"
   },
   "tracker": {
     "title": "Plan leków na dzień",
